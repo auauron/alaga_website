@@ -109,6 +109,9 @@ def start():
 def todo():
     return render_template('todo.html')
 
+@app.route('/care_profiles', methods=['GET', 'POST'])
+def care_profiles():
+    return render_template('care_profiles.html')
 
 if __name__ == '__main__':
     with app.app_context():
