@@ -29,13 +29,21 @@ body {
 .logo-container {
     width: 100px;
     height: 100px;
-    margin: 0 auto;
+    margin: 20px auto;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: white;
     border-radius: 50%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.form-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 24px;
+    font-size: 14px;
+    margin-bottom: 15px;
 }
 .btn {
     display: block;
@@ -81,4 +89,5 @@ body {
     justify-content: center;
     align-items: center;
     color: #666;
+    font-size: 20px;
 }

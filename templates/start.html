@@ -1,30 +1,52 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Get Started - Alaga</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='start.css') }}">
 </head>
-<body>
-    <div class="container">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Alaga Logo" class="logo">
-
-        <h1>Alaga</h1>
-        <p class="tagline">"Your Best Medi-guide"</p>
-
-        <p class="description">
-            Empowering families and caregivers to navigate life-limiting illnesses.
-        </p>
-
-        <div class="button-group">
-            <a href="{{ url_for('register') }}" class="btn primary">Get Started</a>
-            <a href="{{ url_for('login') }}" class="btn secondary">Log-in</a>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="android-container">
+        <!-- Android Status Bar -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
         </div>
-
-        <p class="terms">
-            By clicking continue, you agree to our <br>
-            <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
-        </p>
+        
+        <div class="p-6 flex flex-col h-[calc(100%-96px)] justify-between">
+            <div>
+                <div class="text-center mb-8 mt-6">
+                    <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="mx-auto h-32 w-32">
+                    <h1 class="text-3xl font-bold text-[#c77dbd] mt-4">Alaga</h1>
+                    <p class="text-gray-600 text-sm mt-1">"Your Best Medi-guide"</p>
+                </div>                
+                
+                <p class="text-gray-600 text-sm text-center mb-8">
+                    Empowering families and caregivers to navigate life-limiting illnesses.
+                </p>
+            </div>
+            
+            <div class="mt-auto">
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline">Log-In</a>
+                
+                <p class="text-center text-gray-500 text-xs mt-6 mb-4">
+                    By clicking continue, you agree to our<br>
+                    Terms of Service and Privacy Policy.
+                </p>
+            </div>
+        </div>
     </div>
 </body>
 </html>

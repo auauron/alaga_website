@@ -1,20 +1,54 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Alaga</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
 </head>
-<body>
-    <h1>Login Page</h1>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="android-container">
+        <!-- Header -->
+        <div class="bg-[#c77dbd] text-white p-6">
+            <h2 class="text-2xl font-bold">Hi!</h2>
+            <p class="mt-2">Welcome back to Alaga! Please log in to continue managing your caregiving journey.</p>
+        </div>
+        
+        <!-- Form -->
+        <div class="p-6">
+            <h1 class="text-xl font-semibold text-center mb-4 text-[#c77dbd]">Login Page</h1>
 
-    <form method="POST" action="">
-        {{ form.hidden_tag() }}
-        {{ form.username }}
-        {{ form.password }}
-        {{ form.submit }}
-    </form>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-4">
+                    <label class="block text-[#e63946] text-xs font-medium uppercase mb-2">USERNAME</label>
+                    {{ form.username(class="form-input", placeholder="Enter username here.") }}
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-[#e63946] text-xs font-medium uppercase mb-2">PASSWORD</label>
+                    {{ form.password(class="form-input", placeholder="Enter your password here.") }}
+                </div>
+                
+                {{ form.submit(class="btn btn-primary", value="Log-In") }}
+            </form>
 
-    <a href="{{url_for('register')}}">Don't have an account?</a><br>
+            <div class="text-center text-sm text-gray-600 mt-4">
+                Don't have an account?
+            </div>
+            <a href="{{ url_for('register') }}" class="btn btn-secondary">Create Account</a>
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('start') }}" class="text-gray-500 text-sm hover:underline">Back to Home</a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
