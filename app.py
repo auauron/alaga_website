@@ -20,7 +20,6 @@ login_manager.login_view = 'login'
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
@@ -100,6 +99,16 @@ def register():
         db.session.commit()
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
+
+
+@app.route('/start', methods=['GET', 'POST'])
+def start():
+    return render_template('start.html')
+
+@app.route('/todo', methods=['GET', 'POST'])
+def todo():
+    return render_template('todo.html')
+
 
 if __name__ == '__main__':
     with app.app_context():

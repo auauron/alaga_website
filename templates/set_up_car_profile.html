@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Set Up Care Profile - Alaga</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='set_up_care_profile.css') }}">
+
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="android-container">
+        <!-- Android Status Bar -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+        
+        <div class="p-6 flex flex-col h-[calc(100%-96px)] overflow-auto">
+            <div class="care-header">
+                <h2 class="text-xl font-medium">Your first care.</h2>
+                <p class="text-sm mt-1">Caring starts with understanding. Tell us a little about your loved one or "maalalagaan" so we can support you best.</p>
+            </div>
+            
+            <form method="POST" action="{{ url_for('dashboard') }}">
+                <div class="mb-4">
+                    <label class="form-label">Who are you caring for?</label>
+                    <input type="text" name="care_recipient" class="form-input" placeholder="Enter name here">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label">And your relationship to them?</label>
+                    <input type="text" name="relationship" class="form-input" placeholder="Caregiver, parent, grandchild, etc.">
+                </div>
+                
+                <button type="submit" class="android-btn android-btn-secondary">Set-up Care Profile</button>
+            </form>
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('index') }}" class="text-gray-500 text-sm hover:underline">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
