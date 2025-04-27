@@ -34,7 +34,7 @@
       <aside id="sidebar" class="sidebar fixed md:static w-64 bg-[#BC6FB7] text-white p-6 flex flex-col h-full z-30">
         <div class="flex flex-col items-start mb-8">       
           <h1 class="text-3xl font-bold font-montserrat">Hi, Pia! </h1>
-          <p class="text-white-600 text-sm mt-2">You're doing a great job. We're proud of you.</p>
+          <p class="text-white-600 text-sm mt-2">You're doing a great job. <br> We're proud of you.</p>
         </div>
       
         <!-- Care Profiles Section -->
@@ -133,80 +133,148 @@
 
 <!--bar today-->
 
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
-            <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
+<!-- Today card -->
+        <div class="card bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+          <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
             <h2 class="text-lg font-bold text-white">Today</h2>
-            <button class="text-white text-sm font-bold hover:text-indigo-800 transition">Edit</button>                
-            </div>
-            <div class="p-4">
+            <button type="button" class="edit-btn text-white text-sm font-bold hover:text-indigo-800 transition">Edit</button>
+          </div>
+          <div class="p-4">
             <ul class="space-y-3">
-                <li class="flex items-start">
+              <li class="flex items-center justify-between">
                 <!-- Custom Circular Checkbox -->
-                <input type="checkbox" id="task1" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative">
-                <label for="task1" class="ml-3 text-gray-800">Appointment with Doc Yu at 7:00 AM</label>
-                </li>
-                <li class="flex items-start">
+                <div class="flex items-center">
+                  <input type="checkbox" id="task1" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative"/>
+                  <label for="task1" class="ml-3 text-gray-800">Appointment with Doc Yu at 7:00 AM</label>
+                </div>
+                <!--delete a to do button-->
+                <button type="button" class="delete-btn hidden hover:text-red-700 leading-none">
+                  <i class="fa-solid fa-trash text-red-500 text-xl"></i>
+                </button>
+              </li>
+              <li class="flex items-center justify-between">
                 <!-- Custom Circular Checkbox -->
-                <input type="checkbox" id="task2" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative">
-                <label for="task2" class="ml-3 text-gray-800">Buy Metformin 1 stub.</label>
-                </li>
+                <div class="flex items-center">
+                  <input type="checkbox" id="task2" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative"/>
+                  <label for="task2" class="ml-3 text-gray-800">Buy Metformin 1 stub.</label>
+                </div>
+                <!--delete a to do button-->
+                <button type="button" class="delete-btn hidden hover:text-red-700 leading-none">
+                  <i class="fa-solid fa-trash text-red-500 text-xl"></i>
+                </button>
+              </li>
             </ul>
-            </div>
+          </div>
         </div>
+
+
 
           <!--tomorrow -->
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
-            <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
+        <div class="card bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+          <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
             <h2 class="text-lg font-bold text-white">Tomorrow</h2>
-            <button class="text-white text-sm font-bold hover:text-indigo-800 transition">Edit</button>                
-            </div>
-            <div class="p-4">
+            <button type="button" class="edit-btn text-white text-sm font-bold hover:text-indigo-800 transition">Edit</button>
+          </div>
+          <div class="p-4">
             <ul class="space-y-3">
-                <li class="flex items-start">
+              <li class="flex items-center justify-between">
                 <!-- Custom Circular Checkbox -->
-                <input type="checkbox" id="task1" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative">
-                <label for="task1" class="ml-3 text-gray-800">X-ray at 9 AM.</label>
-                </li>
-                <li class="flex items-start">
+                <div class="flex items-center">
+                  <input type="checkbox" id="task1" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative"/>
+                  <label for="task1" class="ml-3 text-gray-800">Buy facemasks</label>
+                </div>
+                <!--delete a to do button-->
+                <button type="button" class="delete-btn hidden hover:text-red-700 leading-none">
+                  <i class="fa-solid fa-trash text-red-500 text-xl"></i>
+                </button>
+              </li>
+              <li class="flex items-center justify-between">
                 <!-- Custom Circular Checkbox -->
-                <input type="checkbox" id="task2" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative">
-                <label for="task2" class="ml-3 text-gray-800">Buy facemasks.</label>
-                </li>
+                <div class="flex items-center">
+                  <input type="checkbox" id="task2" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative"/>
+                  <label for="task2" class="ml-3 text-gray-800">X-ray Appointment at 9 am</label>
+                </div>
+                <!--delete a to do button-->
+                <button type="button" class="delete-btn hidden hover:text-red-700 leading-none">
+                  <i class="fa-solid fa-trash text-red-500 text-xl"></i>
+                </button>
+              </li>
             </ul>
-            </div>
+          </div>
         </div>
+  
 
         <!--Next next day... -->
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
-            <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
-            <h2 class="text-lg font-bold text-white">April 21</h2>
-            <button class="text-white text-sm font-bold hover:text-indigo-800 transition">Edit</button>                
-            </div>
-            <div class="p-4">
+        <div class="card bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+          <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
+            <h2 class="text-lg font-bold text-white">April 23</h2>
+            <button type="button" class="edit-btn text-white text-sm font-bold hover:text-indigo-800 transition">Edit</button>
+          </div>
+          <div class="p-4">
             <ul class="space-y-3">
-                <li class="flex items-start">
+              <li class="flex items-center justify-between">
                 <!-- Custom Circular Checkbox -->
-                <input type="checkbox" id="task1" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative">
-                <label for="task1" class="ml-3 text-gray-800">Visit Physical therapist</label>
-                </li>
+                <div class="flex items-center">
+                  <input type="checkbox" id="task1" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative"/>
+                  <label for="task1" class="ml-3 text-gray-800">Take blood test.</label>
+                </div>
+                <!--delete a to do button-->
+                <button type="button" class="delete-btn hidden hover:text-red-700 leading-none">
+                  <i class="fa-solid fa-trash text-red-500 text-xl"></i>
+                </button>
+              </li>
+              <li class="flex items-center justify-between">
+                <!-- Custom Circular Checkbox -->
+                <div class="flex items-center">
+                  <input type="checkbox" id="task2" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative"/>
+                  <label for="task2" class="ml-3 text-gray-800">Visit PT at 2 pm.</label>
+                </div>
+                <!--delete a to do button-->
+                <button type="button" class="delete-btn hidden hover:text-red-700 leading-none">
+                  <i class="fa-solid fa-trash text-red-500 text-xl"></i>
+                </button>
+              </li>
             </ul>
+          </div>
+        </div>
 
-            
-            <!-- add a to do button -->
+        <!-- Add To-Do Modal -->
+        <div id="addTodoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h2 class="text-lg font-bold mb-4 text-[#BC6FB7]">Add a New To-Do</h2>
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2">Task:</label>
+              <input type="text" id="newTodoText" class="w-full border rounded px-3 py-2" placeholder="Enter task...">
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2">Date:</label>
+              <select id="newTodoDate" class="w-full border rounded px-3 py-2">
+                <option value="Today">Today</option>
+                <option value="Tomorrow">Tomorrow</option>
+                <!-- Add more if you want -->
+              </select>
+            </div>
+            <div class="flex justify-end space-x-2">
+              <button id="cancelAddTodo" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded">Cancel</button>
+              <button id="saveAddTodo" class="bg-[#BC6FB7] hover:bg-[#E57DDE] text-white px-4 py-2 rounded">Save</button>
+            </div>
+          </div>
+        </div>
 
 
-      <button class="fixed bottom-6 right-6 bg-[#BC6FB7] hover:bg-[#8491D3] text-white p-4 rounded-full shadow-lg transition-all">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-             viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 4v16m8-8H4"/>
-        </svg>
-      </button>
+        <!-- add a to do button -->
+        <button id="openAddTodo" class="fixed bottom-6 right-6 bg-[#BC6FB7] hover:bg-[#E57DDE] text-white p-4 rounded-full shadow-lg transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 4v16m8-8H4"/>
+          </svg>
+        </button>
+
+
       
         
         
-
-
         <!-- styling the checkmark -->
         <style>
             input[type="checkbox"]:checked::before {
@@ -225,6 +293,11 @@
                 color: gray; /* change color to gray when struck through */
             }
 
+              /* when a card has the "editing" class, show delete buttons */
+            .card.editing .delete-btn {
+              display: inline-block;
+            }
+
         </style>
 
         
@@ -236,6 +309,100 @@
         sidebar.classList.toggle('open');
         overlay.classList.toggle('hidden');
       }
+
+
+      // Go to edit mode
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const card = btn.closest('.card');
+          const isEditing = card.classList.toggle('editing');
+          btn.textContent = isEditing ? 'Done' : 'Edit';
+
+          const todos = card.querySelectorAll('li');
+          todos.forEach(todo => {
+            const label = todo.querySelector('label');
+            const checkbox = todo.querySelector('input[type="checkbox"]');
+            const deleteBtn = todo.querySelector('.delete-btn');
+
+            if (isEditing) {
+              label.setAttribute('contenteditable', 'true');  // Allow editing
+              checkbox.disabled = true;                      // Disable checkbox
+              deleteBtn.classList.remove('hidden');           // Show delete button
+            } else {
+              label.removeAttribute('contenteditable');       // Stop editing
+              checkbox.disabled = false;                     // Enable checkbox
+              deleteBtn.classList.add('hidden');               // Hide delete button
+            }
+          });
+        });
+      });
+
+      // Delete items
+      document.addEventListener('click', e => {
+        const delBtn = e.target.closest('.delete-btn');
+        if (!delBtn) return;
+        
+        const li = delBtn.closest('li');
+        if (li) li.remove();
+      });
+
+
+
+            // Open the modal
+      document.getElementById('openAddTodo').addEventListener('click', () => {
+        document.getElementById('addTodoModal').classList.remove('hidden');
+      });
+
+      // Close the modal
+      document.getElementById('cancelAddTodo').addEventListener('click', () => {
+        document.getElementById('addTodoModal').classList.add('hidden');
+      });
+
+      // Save the new to-do
+      document.getElementById('saveAddTodo').addEventListener('click', () => {
+        const text = document.getElementById('newTodoText').value.trim();
+        const date = document.getElementById('newTodoDate').value;
+
+        if (text === '') {
+          alert('Please enter a task.');
+          return;
+        }
+
+        // Find the correct card based on date
+        const card = Array.from(document.querySelectorAll('.card')).find(card => 
+          card.querySelector('h2').textContent.trim() === date
+        );
+
+        if (!card) {
+          alert('No card found for this date!');
+          return;
+        }
+
+        const ul = card.querySelector('ul');
+
+        // Create a new to-do item
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between';
+        li.innerHTML = `
+          <div class="flex items-center">
+            <input type="checkbox" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative" />
+            <label class="ml-3 text-gray-800">${text}</label>
+          </div>
+          <button type="button" class="delete-btn hidden hover:text-red-700 leading-none">
+            <i class="fa-solid fa-trash text-red-500 text-xl"></i>
+          </button>
+        `;
+
+        ul.appendChild(li);
+
+        // Close the modal and clear inputs
+        document.getElementById('addTodoModal').classList.add('hidden');
+        document.getElementById('newTodoText').value = '';
+      });
+
+
+
+
     </script>
   </body>
 </html>
