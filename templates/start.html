@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Get Started - Alaga</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='start.css') }}">
+</head>
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Alaga Logo" class="logo">
+
+        <h1>Alaga</h1>
+        <p class="tagline">"Your Best Medi-guide"</p>
+
+        <p class="description">
+            Empowering families and caregivers to navigate life-limiting illnesses.
+        </p>
+
+        <div class="button-group">
+            <a href="{{ url_for('register') }}" class="btn primary">Get Started</a>
+            <a href="{{ url_for('login') }}" class="btn secondary">Log-in</a>
+        </div>
+
+        <p class="terms">
+            By clicking continue, you agree to our <br>
+            <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+        </p>
+    </div>
+</body>
+</html>
