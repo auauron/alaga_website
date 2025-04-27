@@ -105,6 +105,11 @@ def register():
 def start():
     return render_template('start.html')
 
+@app.route('/todo', methods=['GET', 'POST'])
+def todo():
+    return render_template('todo.html')
+
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
