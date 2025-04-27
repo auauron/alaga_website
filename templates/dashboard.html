@@ -114,7 +114,7 @@
         </header>
 
         <main class="flex-1 overflow-auto p-6">
-          <!-- Care Summary -->
+          <!-- Care Summary -- the date here is dynamix-->
           <div class="mb-6">
             <div class="mb-2"> 
               <h2 class="text-4xl font-bold text-[#596BC7]">Care Summary</h2>
@@ -123,11 +123,19 @@
             </div>
             <div class="bg-gradient-to-r from-pink-400 to-purple-500 rounded-lg p-4 text-white flex items-center justify-between">
               <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                <span>Today's date: April 20, 2025</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                  <line x1="16" x2="16" y1="2" y2="6"/>
+                  <line x1="8" x2="8" y1="2" y2="6"/>
+                  <line x1="3" x2="21" y1="10" y2="10"/>
+                </svg>
+                <span id="todaysDate">Today's date: </span>
               </div>
             </div>
           </div>  
+
+
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             
@@ -259,6 +267,17 @@
         sidebar.classList.toggle('open');
         overlay.classList.toggle('hidden');
       }
+
+      // Function to format the date as "Month Day, Year"
+      function formatDate(date) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+      }
+
+      // Get today's date and update the span
+      const today = new Date();
+      document.getElementById('todaysDate').textContent = `Today's date: ${formatDate(today)}`;
+
     </script>
   </body>
 </html>
