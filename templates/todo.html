@@ -131,9 +131,8 @@
             </div>
           </div>  
 
-<!--bar today-->
+<!--card today-->
 
-<!-- Today card -->
         <div class="card bg-white rounded-lg shadow-sm overflow-hidden mb-6">
           <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
             <h2 class="text-lg font-bold text-white">Today</h2>
@@ -238,35 +237,6 @@
           </div>
         </div>
 
-    
-      <!-- Add To-Do Modal -->
-      <div id="addTodoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-80">
-          <h2 class="text-lg font-bold mb-4 text-[#BC6FB7]">Add a New To-Do</h2>
-          <div class="mb-4">
-            <label class="block text-gray-700 mb-2">Task:</label>
-            <input type="text" id="newTodoText" class="w-full border rounded px-3 py-2" placeholder="Enter task...">
-          </div>
-
-          <div class="mb-4">
-            <label class="block text-gray-700 mb-2">Date:</label>
-            <select id="newTodoDate" class="w-full border rounded px-3 py-2">
-              <option value="Today">Today</option>
-              <option value="Tomorrow">Tomorrow</option>
-              <option value="Custom">Select Date</option> <!-- Custom option added -->
-            </select>
-            <!-- Date picker input, hidden by default -->
-            <input id="datePicker" type="date" class="w-full border rounded px-3 py-2 mt-2 hidden">
-          </div>
-
-          <div class="flex justify-end space-x-2">
-            <button id="cancelAddTodo" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded">Cancel</button>
-            <button id="saveAddTodo" class="bg-[#BC6FB7] hover:bg-[#E57DDE] text-white px-4 py-2 rounded">Save</button>
-          </div>
-        </div>
-      </div>
-
-
 
         <!-- add a to do button -->
         <button id="openAddTodo" class="fixed bottom-6 right-6 bg-[#BC6FB7] hover:bg-[#E57DDE] text-white p-4 rounded-full shadow-lg transition-all">
@@ -277,6 +247,32 @@
           </svg>
         </button>
 
+              <!-- Add To-Do Modal -->
+        <div id="addTodoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h2 class="text-lg font-bold mb-4 text-[#BC6FB7]">What do you need to do?</h2>
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2">To do:</label>
+              <input type="text" id="newTodoText" class="w-full border rounded px-3 py-2" placeholder="Enter your task here..">
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2">Date:</label>
+              <select id="newTodoDate" class="w-full border rounded px-3 py-2">
+                <option value="Today">Today</option>
+                <option value="Tomorrow">Tomorrow</option>
+                <option value="Custom">Select Date</option> <!-- Custom option added -->
+              </select>
+              <!-- Date picker input, hidden by default -->
+              <input id="datePicker" type="date" class="w-full border rounded px-3 py-2 mt-2 hidden">
+            </div>
+
+            <div class="flex justify-end space-x-2">
+              <button id="cancelAddTodo" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded">Cancel</button>
+              <button id="saveAddTodo" class="bg-[#BC6FB7] hover:bg-[#E57DDE] text-white px-4 py-2 rounded">Save</button>
+            </div>
+          </div>
+        </div>
 
       
         
@@ -392,7 +388,7 @@
         }
 
         if (text === '') {
-          alert('Please enter a task.');
+          alert('Please enter a to do task.');
           return;
         }
 
