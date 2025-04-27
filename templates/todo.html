@@ -238,28 +238,34 @@
           </div>
         </div>
 
-        <!-- Add To-Do Modal -->
-        <div id="addTodoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div class="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 class="text-lg font-bold mb-4 text-[#BC6FB7]">Add a New To Do</h2>
-            <div class="mb-4">
-              <label class="block text-gray-700 mb-2">Task:</label>
-              <input type="text" id="newTodoText" class="w-full border rounded px-3 py-2" placeholder="Enter your task here.">
-            </div>
-            <div class="mb-4">
-              <label class="block text-gray-700 mb-2">Date:</label>
-              <select id="newTodoDate" class="w-full border rounded px-3 py-2">
-                <option value="Today">Today</option>
-                <option value="Tomorrow">Tomorrow</option>
-                <!-- Add more if you want -->
-              </select>
-            </div>
-            <div class="flex justify-end space-x-2">
-              <button id="cancelAddTodo" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded">Cancel</button>
-              <button id="saveAddTodo" class="bg-[#BC6FB7] hover:bg-[#E57DDE] text-white px-4 py-2 rounded">Save</button>
-            </div>
+    
+      <!-- Add To-Do Modal -->
+      <div id="addTodoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-80">
+          <h2 class="text-lg font-bold mb-4 text-[#BC6FB7]">Add a New To-Do</h2>
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-2">Task:</label>
+            <input type="text" id="newTodoText" class="w-full border rounded px-3 py-2" placeholder="Enter task...">
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-2">Date:</label>
+            <select id="newTodoDate" class="w-full border rounded px-3 py-2">
+              <option value="Today">Today</option>
+              <option value="Tomorrow">Tomorrow</option>
+              <option value="Custom">Select Date</option> <!-- Custom option added -->
+            </select>
+            <!-- Date picker input, hidden by default -->
+            <input id="datePicker" type="date" class="w-full border rounded px-3 py-2 mt-2 hidden">
+          </div>
+
+          <div class="flex justify-end space-x-2">
+            <button id="cancelAddTodo" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded">Cancel</button>
+            <button id="saveAddTodo" class="bg-[#BC6FB7] hover:bg-[#E57DDE] text-white px-4 py-2 rounded">Save</button>
           </div>
         </div>
+      </div>
+
 
 
         <!-- add a to do button -->
@@ -347,10 +353,13 @@
       });
 
 
+                          // SOPHIAAA DITO KAAA KADTOOO
 
-            // Open the modal
+      // Open the modal
       document.getElementById('openAddTodo').addEventListener('click', () => {
         document.getElementById('addTodoModal').classList.remove('hidden');
+        document.getElementById('datePicker').classList.add('hidden'); // Hide the date picker initially
+        document.getElementById('newTodoDate').value = 'Today'; // Default to "Today"
       });
 
       // Close the modal
@@ -358,29 +367,70 @@
         document.getElementById('addTodoModal').classList.add('hidden');
       });
 
+      // Toggle the visibility of the date picker input
+      document.getElementById('newTodoDate').addEventListener('change', (e) => {
+        const datePicker = document.getElementById('datePicker');
+        if (e.target.value === 'Custom') {
+          datePicker.classList.remove('hidden'); // Show the date picker
+        } else {
+          datePicker.classList.add('hidden'); // Hide the date picker
+        }
+      });
+
       // Save the new to-do
       document.getElementById('saveAddTodo').addEventListener('click', () => {
         const text = document.getElementById('newTodoText').value.trim();
-        const date = document.getElementById('newTodoDate').value;
+        let date = '';
+
+        // Determine the date based on selection
+        if (document.getElementById('newTodoDate').value === 'Today') {
+          date = 'Today';
+        } else if (document.getElementById('newTodoDate').value === 'Tomorrow') {
+          date = 'Tomorrow';
+        } else if (document.getElementById('newTodoDate').value === 'Custom') {
+          date = document.getElementById('datePicker').value.trim(); // Get custom date from date picker
+        }
 
         if (text === '') {
           alert('Please enter a task.');
           return;
         }
 
-        // Find the correct card based on date
-        const card = Array.from(document.querySelectorAll('.card')).find(card => 
+        if (date === '') {
+          alert('Please select a date.');
+          return;
+        }
+
+        // Find if there's already a card for the selected date
+        let card = Array.from(document.querySelectorAll('.card')).find(card => 
           card.querySelector('h2').textContent.trim() === date
         );
 
+        // If no card, CREATE a new card
         if (!card) {
-          alert('No card found for this date!');
-          return;
+          const mainContainer = document.querySelector('.flex-1.flex.flex-col.overflow-hidden');
+          const newCard = document.createElement('div');
+          newCard.className = 'card bg-white rounded-lg shadow-sm overflow-hidden mb-6';
+          newCard.innerHTML = `
+            <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
+              <h2 class="text-lg font-bold text-white">${date}</h2>
+              <button type="button" class="edit-btn text-white text-sm font-bold hover:text-indigo-800 transition">Edit</button>
+            </div>
+            <div class="p-4">
+              <ul class="space-y-3"></ul>
+            </div>
+          `;
+          mainContainer.appendChild(newCard);
+
+          // Reattach edit button listener
+          attachEditListeners();
+
+          card = newCard;
         }
 
         const ul = card.querySelector('ul');
 
-        // Create a new to-do item
+        // Create the new task inside
         const li = document.createElement('li');
         li.className = 'flex items-center justify-between';
         li.innerHTML = `
@@ -398,6 +448,10 @@
         // Close the modal and clear inputs
         document.getElementById('addTodoModal').classList.add('hidden');
         document.getElementById('newTodoText').value = '';
+        document.getElementById('datePicker').value = '';
+
+        // Scroll to the new task
+        li.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
 
 
