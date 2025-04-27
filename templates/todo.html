@@ -429,7 +429,6 @@
         }
 
         const ul = card.querySelector('ul');
-
         // Create the new task inside
         const li = document.createElement('li');
         li.className = 'flex items-center justify-between';
@@ -450,8 +449,6 @@
         document.getElementById('newTodoText').value = '';
         document.getElementById('datePicker').value = '';
 
-        // Scroll to the new task
-        li.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
 
 
