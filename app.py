@@ -128,8 +128,12 @@ def start():
 
 #route for to do page
 @app.route('/todo', methods=['GET', 'POST'])
+@login_required
 def todo():
-    return render_template('todo.html')
+    fullname = current_user.fullname
+    initials = get_initials(fullname)
+    return render_template('todo.html', fullname=fullname, initials=initials)
+
 
 # route for care profiles page
 @app.route('/care_profiles', methods=['GET', 'POST'])
