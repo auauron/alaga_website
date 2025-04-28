@@ -36,18 +36,6 @@
           <h1 class="text-3xl font-bold font-montserrat">Hi, {{ fullname.split()[0] }}! </h1>
           <p class="text-white-600 text-sm mt-2">You're doing a great job. <br> We're proud of you.</p>
         </div>
-      
-        <!-- Care Profiles Section -->
-        <div class="mb-8">
-          <h2 class="text-white/80 text-xl font-bold mb-2">Caregiver</h2>
-          <div class="space-y-2">
-            <!-- User's own profile -->
-            <form action="{{ url_for('dashboard') }}" method="get">
-              <button type="submit" class="w-full flex items-center space-x-3 {% if not session.get('active_profile_id') %}bg-white/10{% endif %} rounded-lg p-2 hover:bg-white/20 transition">
-                <div class="w-10 h-10 rounded-full bg-indigo-400 flex items-center justify-center font-medium text-sm">{{ initials }}</div>
-                <span>{{ fullname }}</span>
-              </button>
-            </form>
             
             <!-- Care Profiles Section -->
             <div class="mb-8">
