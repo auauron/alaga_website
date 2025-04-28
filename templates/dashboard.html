@@ -186,7 +186,7 @@
             <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
               <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
                 <h2 class="text-lg font-bold text-white">Medications to take</h2>
-                <a href="medications.html" class="text-white text-sm font-bold hover:text-indigo-800 transition">View All</a>  
+                <a href="{{ url_for('medications') }}" class="text-white text-sm font-bold hover:text-indigo-800 transition">View All</a>  
               </div>
               <div class="divide-y divide-gray-100">
                 <div class="p-4 flex items-center justify-between transition hover:bg-gray-50">
@@ -217,7 +217,7 @@
           <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
             <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
               <h2 class="text-lg font-bold text-white">Health Records</h2>
-              <a href="healthrecords.html" class="text-white text-sm font-bold hover:text-indigo-800 transition">View All</a>  
+              <a href="{{ url_for('health_records') }}" class="text-white text-sm font-bold hover:text-indigo-800 transition">View All</a>  
             </div>
             <div class="divide-y divide-gray-100">
               <div class="p-4 flex items-center justify-between transition hover:bg-gray-50">
