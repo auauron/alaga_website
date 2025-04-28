@@ -114,7 +114,7 @@
         </header>
 
         <main class="flex-1 overflow-auto p-6">
-          <!-- Care Summary -- the date here is dynamix-->
+          <!-- head -- the date here is dynamix-->
           <div class="mb-6">
             <div class="mb-2"> 
               <h2 class="text-4xl font-bold text-[#596BC7]">Medications</h2>
@@ -132,5 +132,164 @@
               </div>
             </div>
           </div>  
+
+
+            <!-- Medications -->
+          <div class="divide-y divide-gray-100">
+            {% if medications %}
+              {% for med in medications %}
+              <div class="p-4 flex items-center justify-between transition hover:bg-gray-50">
+                <div class="flex items-start">
+                  <div class="bg-blue-100 p-2 rounded-full mr-3">
+                    <i class="fa-solid fa-tablets" style="color: #000000;"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-medium text-gray-900">{{ med.name }}</h3>
+                    <p class="text-sm text-gray-600">{{ med.dosage }}</p>
+                    <p class="text-xs text-gray-500">{{ med.instructions }}</p>
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <div class="flex items-center mr-4 text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1">
+                      <circle cx="12" cy="12" r="10"/>
+                      <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span class="text-sm">{{ med.time }}</span>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="p-4 text-center text-gray-500">
+                No medications scheduled for today.
+              </div>
+            {% endif %}
+          </div>
+            
+          <!-- add a med button -->
+          <button id="openAddMedication" class="fixed bottom-6 right-6 bg-[#BC6FB7] hover:bg-[#E57DDE] text-white p-4 rounded-full shadow-lg transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 4v16m8-8H4"/>
+            </svg>
+          </button>
+
+          <!-- add med modal -->
+        <div id="addMedicationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center">
+          <div class="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h2 class="text-lg font-semibold mb-4">Add Medication</h2>
+            <form id="addMedicationForm">
+              <div class="mb-2">
+                <label class="block text-sm font-medium text-gray-700">Name</label>
+                <input type="text" name="name" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+              </div>
+              <div class="mb-2">
+                <label class="block text-sm font-medium text-gray-700">Dosage (optional)</label>
+                <input type="text" name="dosage" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+              </div>
+              <div class="mb-2">
+                <label class="block text-sm font-medium text-gray-700">Instructions (optional)</label>
+                <input type="text" name="instructions" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+              </div>
+              <div class="mb-2">
+                <label class="block text-sm font-medium text-gray-700">Dosage Type</label>
+                <select name="dosageType" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                  <option value="tablet">Tablet</option>
+                  <option value="capsule">Capsule</option>
+                  <option value="powder">Powder</option>
+                  <option value="solution">Solution</option>
+                  <option value="injection">Injection</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="mb-2">
+                <label class="block text-sm font-medium text-gray-700">Start Date</label>
+                <input type="date" name="startDate" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+              </div>
+              <div class="mb-2">
+                <label class="block text-sm font-medium text-gray-700">End Date</label>
+                <input type="date" name="endDate" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+              </div>
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Time</label>
+                <input type="time" name="time" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+              </div>
+              <div class="flex justify-end space-x-2">
+                <button type="button" id="cancelAddMedication" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-[#BC6FB7] text-white rounded hover:bg-[#E57DDE]">Add</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+
+
+
+    <script>
+      function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('hidden');
+      }
+
+      // Function to format the date as "Month Day, Year"
+      function formatDate(date) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+      }
+
+      // Get today's date and update the span
+      const today = new Date();
+      document.getElementById('todaysDate').textContent = `Today's date: ${formatDate(today)}`;
+
+      const openBtn = document.getElementById('openAddMedication');
+      const modal = document.getElementById('addMedicationModal');
+      const cancelBtn = document.getElementById('cancelAddMedication');
+      const form = document.getElementById('addMedicationForm');
+
+      const medicationList = document.getElementById('medicationList'); // You must have a container for medications
+
+      openBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      });
+
+      cancelBtn.addEventListener('click', () => {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+      });
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const medData = Object.fromEntries(formData.entries());
+
+        addMedicationCard(medData);
+
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+        form.reset();
+      });
+
+      function addMedicationCard(medication) {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg p-4 shadow mb-4';
+
+        card.innerHTML = `
+          <h3 class="text-lg font-semibold">${medication.name}</h3>
+          <p class="text-sm text-gray-600">Date: ${medication.date} Time: ${medication.time}</p>
+          ${medication.dosage ? `<p class="text-sm text-gray-600">Dosage: ${medication.dosage}</p>` : ''}
+          ${medication.instructions ? `<p class="text-sm text-gray-600">Instructions: ${medication.instructions}</p>` : ''}
+        `;
+
+        medicationList.appendChild(card);
+      }
+    </script>
+
+
+
   </body>
 </html>
