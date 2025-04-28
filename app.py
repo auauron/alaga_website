@@ -100,18 +100,35 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
+# route for view profile
+@app.route('/viewprofile')
+def view_profile():
+    return render_template('view_profile.html')
+
 
 @app.route('/start', methods=['GET', 'POST'])
 def start():
     return render_template('start.html')
 
+#route for to do page
 @app.route('/todo', methods=['GET', 'POST'])
 def todo():
     return render_template('todo.html')
 
+# route for care profiles page
 @app.route('/care_profiles', methods=['GET', 'POST'])
 def care_profiles():
     return render_template('care_profiles.html')
+
+#route for medications page
+@app.route('/medications')
+def medications():
+    return render_template('medications.html')
+
+#route for health records page
+@app.route('/health_records')
+def health_records():
+    return render_template('health_records.html')
 
 if __name__ == '__main__':
     with app.app_context():
