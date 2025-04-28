@@ -1,131 +1,118 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Alaga - Health Records</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="shortcut icon" href="../static/images/favicon.ico" type="image/x-icon"/>
-    <style>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alaga - Edit Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon"/>
+  <style>
+    .sidebar {
+      transition: transform 0.3s ease-in-out;
+    }
+    @media (max-width: 768px) {
       .sidebar {
-        transition: transform 0.3s ease-in-out;
+        transform: translateX(-100%);
       }
-      
-      @media (max-width: 768px) {
-        .sidebar {
-          transform: translateX(-100%);
-        }
-        .sidebar.open {
-          transform: translateX(0);
-        }
+      .sidebar.open {
+        transform: translateX(0);
       }
-    </style>
-  </head>
-  <body class="min-h-screen bg-gray-50 font-[Inter]">
-    <div class="flex h-screen relative">
-      <!-- Overlay -->
-      <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden" onclick="toggleSidebar()"></div>
-      
-      <!-- Sidebar -->
-      <aside id="sidebar" class="sidebar fixed md:static w-64 bg-[#BC6FB7] text-white p-6 flex flex-col h-full z-30">
-        <div class="flex flex-col items-start mb-8">       
-          <h1 class="text-3xl font-bold font-montserrat">Hi, Pia! </h1>
-          <p class="text-white-600 text-sm mt-2">You're doing a great job. <br> We're proud of you.</p>
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-gray-50 font-[Inter]">
+<div class="flex h-screen relative">
+  <!-- Overlay -->
+  <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden" onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar fixed md:static w-64 bg-[#BC6FB7] text-white p-6 flex flex-col h-full z-30">
+    <!-- Same sidebar as your code -->
+    <div class="flex flex-col items-start mb-8">
+      <h1 class="text-3xl font-bold font-montserrat">Hi, {{ fullname.split(' ')[0] }}!</h1>
+      <p class="text-white-600 text-sm mt-2">You're doing a great job.<br> We're proud of you.</p>
+    </div>
+
+    <!-- Care Profiles -->
+    <div class="mb-8">
+      <h2 class="text-white/80 text-sm font-medium mb-3">Care Profiles</h2>
+      <!-- (static buttons, you can make these dynamic later) -->
+      <div class="space-y-2">
+        <button class="w-full flex items-center space-x-3 bg-white/10 rounded-lg p-2 hover:bg-white/20 transition">
+          <div class="w-8 h-8 rounded-full bg-pink-400 flex items-center justify-center font-medium text-sm">MC</div>
+          <span>Maria Clara</span>
+        </button>
+        <button class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 transition">
+          <div class="w-8 h-8 rounded-full bg-blue-400 flex items-center justify-center font-medium text-sm">LL</div>
+          <span>Lemuel Luceno</span>
+        </button>
+        <button class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 transition">
+          <div class="w-8 h-8 rounded-full bg-green-400 flex items-center justify-center font-medium text-sm">AA</div>
+          <span>Ahron Alera</span>
+        </button>
+      </div>
+      <a href="{{ url_for('care_profiles') }}" class="w-full block text-sm text-white/60 hover:text-white mt-2 text-left pl-2">+ Add Profiles</a>
+    </div>
+
+    <!-- Main Menu -->
+    <nav class="flex-1">
+      <h2 class="text-white/80 text-sm font-medium mb-3">Main Menu</h2>
+      <div class="space-y-1">
+        <a href="{{ url_for('dashboard') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/20 transition">
+          <i class="fa-solid fa-house"></i><span>Home</span>
+        </a>
+        <a href="{{ url_for('todo') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
+          <i class="fa-solid fa-list-check"></i><span>To do</span>
+        </a>
+        <a href="{{ url_for('medications') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
+          <i class="fa-solid fa-pills"></i><span>Medications</span>
+        </a>
+        <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 bg-white/10 rounded-lg p-3 hover:bg-white/10 transition">
+          <i class="fa-solid fa-notes-medical"></i><span>Health Records</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- User Profile -->
+    <div class="mt-auto pt-4 border-t border-white/10">
+      <a href="{{ url_for('view_profile') }}" class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 transition">
+        <div class="w-8 h-8 rounded-full bg-indigo-400 flex items-center justify-center font-medium text-sm">{{ initials }}</div>
+        <div class="text-left">
+          <div class="text-sm font-medium">{{ fullname }}</div>
+          <div class="text-xs text-white/60">View Profile</div>
         </div>
-      
-        <!-- Care Profiles Section -->
-        <div class="mb-8">
-          <h2 class="text-white/80 text-sm font-medium mb-3">Care Profiles</h2>
-          <div class="space-y-2">
-            <button class="w-full flex items-center space-x-3 bg-white/10 rounded-lg p-2 hover:bg-white/20 transition">
-              <div class="w-8 h-8 rounded-full bg-pink-400 flex items-center justify-center font-medium text-sm">MC</div>
-              <span>Maria Clara</span>
-            </button>
-            <button class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 transition">
-              <div class="w-8 h-8 rounded-full bg-blue-400 flex items-center justify-center font-medium text-sm">LL</div>
-              <span>Lemuel Luceno</span>
-            </button>
-            <button class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 transition">
-              <div class="w-8 h-8 rounded-full bg-green-400 flex items-center justify-center font-medium text-sm">AA</div>
-              <span>Ahron Alera</span>
-            </button>
-          </div>
-          <a href="{{ url_for('care_profiles') }}" class="w-full block text-sm text-white/60 hover:text-white mt-2 text-left pl-2"> + Add Profiles </a>
-        </div>
+      </a>
+    </div>
+  </aside>
 
-        <!-- Main Menu (in sidebar) -->
-        <nav class="flex-1">
-          <h2 class="text-white/80 text-sm font-medium mb-3">Main Menu</h2>
-          <div class="space-y-1">
-            <!--Home-->
-            <a href="{{ url_for('dashboard') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/20 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              <span>Home</span>
-            </a>
-            <!--To do-->
-            <a href="{{ url_for('todo') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
-              <i class="fa-solid fa-list-check"></i>
-              <span>To do</span>
-            </a>
-            <!--Medications-->
-            <a href="{{ url_for('medications') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
-              <i class="fa-solid fa-pills"></i>
-              <span>Medications</span>
-            </a>
-            <!--Health Records-->
-            <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 bg-white/10 rounded-lg p-3 hover:bg-white/10 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-              <span>Health Records</span>
-            </a>
-          </div>
-        </nav>
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <header class="bg-white py-3 px-6 shadow-sm flex items-center justify-between">
+      <div class="flex items-center">
+        <button onclick="toggleSidebar()" class="mr-4 md:hidden">
+          <i class="fa-solid fa-bars fa-lg text-indigo-400"></i>
+        </button>
+        <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="h-8 w-8 mr-2">
+        <h2 class="text-3xl font-bold text-[#BC6FB7]">Alaga</h2>
+      </div>
+    </header>
 
-        <!-- User Profile -->
-        <div class="mt-auto pt-4 border-t border-white/10">
-          <a href="{{ url_for('view_profile') }}" class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 transition">
-            <div class="w-8 h-8 rounded-full bg-indigo-400 flex items-center justify-center font-medium text-sm">PA</div>
-            <div class="text-left">
-              <div class="text-sm font-medium">Pia Alopeya</div>
-              <div class="text-xs text-white/60">View Profile</div>
-            </div>
-          </a>
-        </div>
-      </aside>
-
-      <!-- Main Content -->
-      <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="bg-white py-3 px-6 shadow-sm flex items-center justify-between">
-          <div class="flex items-center">
-            <button onclick="toggleSidebar()" class="mr-4 md:hidden">
-              <i class="fa-solid fa-bars fa-lg" style="color: #8491d3;"></i>
-            </button>
-            <img src="../static/images/alaga_logo_trans.png" alt="Alaga Logo" class="h-8 w-8 mr-2">
-            <h2 class="text-3xl font-bold text-[#BC6FB7]">Alaga</h2>
-          </div>
-          <div class="flex items-center space-x-4">
-            <button class="text-gray-500 hover:text-gray-700">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-            </button>
-          </div>
-        </header>
-
-        <main class="flex-1 overflow-auto p-6">
-
-
-      <!-- HEREEE -->
-      <main class="bg-white rounded-xl shadow-sm p-8">
+    <main class="flex-1 overflow-auto p-6">
+      <div class="bg-white rounded-xl shadow-sm p-8">
         <h2 class="text-2xl font-semibold text-indigo-900 mb-6">Edit Your Profile</h2>
-        
+
         <!-- Profile Form -->
-        <form class="space-y-6">
+        <form method="POST" action="{{ url_for('view_profile') }}" class="space-y-6">
+
           <!-- Profile Picture -->
           <div class="flex justify-center">
             <div class="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-              <div class="text-2xl font-semibold text-purple-600">PA</div>
+              <div class="text-2xl font-semibold text-purple-600">{{ initials }}</div>
             </div>
           </div>
 
@@ -135,7 +122,8 @@
             <input
               type="text"
               id="name"
-              value="Pia Alopeya"
+              name="name"
+              value="{{ fullname }}"
               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
           </div>
@@ -146,20 +134,17 @@
             <input
               type="text"
               id="username"
-              value="piausermameko"
+              name="username"
+              value="{{ username }}"
               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
           </div>
 
           <!-- Password -->
           <div>
-            <label for="password" class="block text-sm font-medium text-purple-600 mb-1">Password</label>
-            <input
-              type="password"
-              id="password"
-              value="••••••••"
-              class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            >
+            <label for="password" class="block text-sm font-medium text-purple-600 mb-1">Password (Leave blank if no change)</label>
+            <input type="password" id="password" name="password" placeholder="New Password"
+              class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:outline-none">
           </div>
 
           <!-- Buttons -->
@@ -168,16 +153,29 @@
               <button type="submit" class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
                 Save Changes
               </button>
-              <button type="button" class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+              <a href="{{ url_for('dashboard') }}" class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
                 Cancel
-              </button>
+              </a>
             </div>
-            <button type="button" class="px-6 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition">
+            <a href="{{ url_for('logout') }}" class="px-6 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition">
               Log Out
-            </button>
+            </a>
           </div>
         </form>
-      </main>
-    </div>
-  </body>
+      </div>
+    </main>
+
+  </div>
+</div>
+
+<script>
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('hidden');
+}
+</script>
+
+</body>
 </html>
