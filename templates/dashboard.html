@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" href="../static/images/favicon.ico" type="image/x-icon"/>
     <style>
       .sidebar {
         transition: transform 0.3s ease-in-out;
@@ -72,12 +72,12 @@
               <span>To do</span>
             </a>
             <!--Medications-->
-            <a href="medications.html" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
+            <a href="{{ url_for('medications') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
               <i class="fa-solid fa-pills"></i>
               <span>Medications</span>
             </a>
             <!--Health Records-->
-            <a href="healthrecords.html" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
+            <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
               <span>Health Records</span>
             </a>
@@ -86,13 +86,13 @@
 
         <!-- User Profile -->
         <div class="mt-auto pt-4 border-t border-white/10">
-          <button class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 transition">
+          <a href="{{ url_for('view_profile') }}" class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 transition">
             <div class="w-8 h-8 rounded-full bg-indigo-400 flex items-center justify-center font-medium text-sm">PA</div>
             <div class="text-left">
               <div class="text-sm font-medium">Pia Alopeya</div>
               <div class="text-xs text-white/60">View Profile</div>
             </div>
-          </button>
+          </a>
         </div>
       </aside>
 
@@ -103,7 +103,7 @@
             <button onclick="toggleSidebar()" class="mr-4 md:hidden">
               <i class="fa-solid fa-bars fa-lg" style="color: #8491d3;"></i>
             </button>
-            <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="h-8 w-8 mr-2">
+            <img src="../static/images/alaga_logo_trans.png" alt="Alaga Logo" class="h-8 w-8 mr-2">
             <h2 class="text-3xl font-bold text-[#BC6FB7]">Alaga</h2>
           </div>
           <div class="flex items-center space-x-4">
@@ -186,7 +186,7 @@
             <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
               <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
                 <h2 class="text-lg font-bold text-white">Medications to take</h2>
-                <a href="medications.html" class="text-white text-sm font-bold hover:text-indigo-800 transition">View All</a>  
+                <a href="{{ url_for('medications') }}" class="text-white text-sm font-bold hover:text-indigo-800 transition">View All</a>  
               </div>
               <div class="divide-y divide-gray-100">
                 <div class="p-4 flex items-center justify-between transition hover:bg-gray-50">
@@ -217,7 +217,7 @@
           <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
             <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
               <h2 class="text-lg font-bold text-white">Health Records</h2>
-              <a href="healthrecords.html" class="text-white text-sm font-bold hover:text-indigo-800 transition">View All</a>  
+              <a href="{{ url_for('health_records') }}" class="text-white text-sm font-bold hover:text-indigo-800 transition">View All</a>  
             </div>
             <div class="divide-y divide-gray-100">
               <div class="p-4 flex items-center justify-between transition hover:bg-gray-50">

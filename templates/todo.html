@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" href="../static/images/favicon.ico" type="image/x-icon"/>
     <style>
       .sidebar {
         transition: transform 0.3s ease-in-out;
@@ -103,15 +103,12 @@
             <button onclick="toggleSidebar()" class="mr-4 md:hidden">
               <i class="fa-solid fa-bars fa-lg" style="color: #8491d3;"></i>
             </button>
-            <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="h-8 w-8 mr-2">
+            <img src="../static/images/alaga_logo_trans.png" alt="Alaga Logo" class="h-8 w-8 mr-2">
             <h2 class="text-3xl font-bold text-[#BC6FB7]">Alaga</h2>
           </div>
           <div class="flex items-center space-x-4">
             <button class="text-gray-500 hover:text-gray-700">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-            </button>
-            <button class="text-gray-500 hover:text-gray-700">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
             </button>
           </div>
         </header>
@@ -125,8 +122,13 @@
             </div>
             <div class="bg-gradient-to-r from-pink-400 to-purple-500 rounded-lg p-4 text-white flex items-center justify-between">
               <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                <span>Today's date: April 20, 2025</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                  <line x1="16" x2="16" y1="2" y2="6"/>
+                  <line x1="8" x2="8" y1="2" y2="6"/>
+                  <line x1="3" x2="21" y1="10" y2="10"/>
+                </svg>
+                <span id="todaysDate">Today's date: </span>
               </div>
             </div>
           </div>  
@@ -313,6 +315,17 @@
       }
 
 
+            // Function to format the date as "Month Day, Year"
+      function formatDate(date) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+      }
+
+      // Get today's date and update the span
+      const today = new Date();
+      document.getElementById('todaysDate').textContent = `Today's date: ${formatDate(today)}`;
+
+
       // Go to edit mode
       document.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -348,6 +361,7 @@
         if (li) li.remove();
       });
 
+      
 
                           // SOPHIAAA DITO KAAA KADTOOO
 
@@ -445,6 +459,7 @@
         document.getElementById('newTodoText').value = '';
         document.getElementById('datePicker').value = '';
 
+        
       });
 
 

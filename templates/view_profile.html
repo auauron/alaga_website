@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Alaga - Medications</title>
+    <title>Alaga - Health Records</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -72,12 +72,12 @@
               <span>To do</span>
             </a>
             <!--Medications-->
-            <a href="{{ url_for('medications') }}" class="flex items-center space-x-3 bg-white/10 rounded-lg p-3 hover:bg-white/10 transition">
+            <a href="{{ url_for('medications') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
               <i class="fa-solid fa-pills"></i>
               <span>Medications</span>
             </a>
             <!--Health Records-->
-            <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
+            <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 bg-white/10 rounded-lg p-3 hover:bg-white/10 transition">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
               <span>Health Records</span>
             </a>
@@ -114,23 +114,70 @@
         </header>
 
         <main class="flex-1 overflow-auto p-6">
-          <!-- Care Summary -- the date here is dynamix-->
-          <div class="mb-6">
-            <div class="mb-2"> 
-              <h2 class="text-4xl font-bold text-[#596BC7]">Medications</h2>
-              <p class="text-gray-600 text-sm">&nbsp;Ensure Maria Clara takes their meds on time!</p>
+
+
+      <!-- HEREEE -->
+      <main class="bg-white rounded-xl shadow-sm p-8">
+        <h2 class="text-2xl font-semibold text-indigo-900 mb-6">Edit Your Profile</h2>
+        
+        <!-- Profile Form -->
+        <form class="space-y-6">
+          <!-- Profile Picture -->
+          <div class="flex justify-center">
+            <div class="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center mb-4">
+              <div class="text-2xl font-semibold text-purple-600">PA</div>
             </div>
-            <div class="bg-gradient-to-r from-pink-400 to-purple-500 rounded-lg p-4 text-white flex items-center justify-between">
-              <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
-                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                  <line x1="16" x2="16" y1="2" y2="6"/>
-                  <line x1="8" x2="8" y1="2" y2="6"/>
-                  <line x1="3" x2="21" y1="10" y2="10"/>
-                </svg>
-                <span id="todaysDate">Today's date: </span>
-              </div>
+          </div>
+
+          <!-- Name -->
+          <div>
+            <label for="name" class="block text-sm font-medium text-purple-600 mb-1">Name</label>
+            <input
+              type="text"
+              id="name"
+              value="Pia Alopeya"
+              class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            >
+          </div>
+
+          <!-- Username -->
+          <div>
+            <label for="username" class="block text-sm font-medium text-purple-600 mb-1">Username</label>
+            <input
+              type="text"
+              id="username"
+              value="piausermameko"
+              class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            >
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password" class="block text-sm font-medium text-purple-600 mb-1">Password</label>
+            <input
+              type="password"
+              id="password"
+              value="••••••••"
+              class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            >
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex items-center justify-between pt-4">
+            <div class="flex space-x-3">
+              <button type="submit" class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                Save Changes
+              </button>
+              <button type="button" class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+                Cancel
+              </button>
             </div>
-          </div>  
+            <button type="button" class="px-6 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition">
+              Log Out
+            </button>
+          </div>
+        </form>
+      </main>
+    </div>
   </body>
 </html>
