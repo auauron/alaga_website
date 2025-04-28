@@ -42,24 +42,31 @@
       <p class="text-white/80 text-sm mt-2">You're doing a great job.<br> We're proud of you.</p>
     </div>
 
-    <!-- Care Profiles -->
-    <div class="mb-8">
-      <h2 class="text-white/80 text-sm font-medium mb-3">Care Profiles</h2>
-      <div class="space-y-2">
-        <button class="w-full flex items-center space-x-3 bg-white/10 hover:bg-white/20 dark:hover:bg-white/30 rounded-lg p-2 transition">
-          <div class="w-8 h-8 rounded-full bg-pink-400 flex items-center justify-center font-medium text-sm">MC</div>
-          <span>Maria Clara</span>
-        </button>
-        <button class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 dark:hover:bg-white/20 transition">
-          <div class="w-8 h-8 rounded-full bg-blue-400 flex items-center justify-center font-medium text-sm">LL</div>
-          <span>Lemuel Luceno</span>
-        </button>
-        <button class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 dark:hover:bg-white/20 transition">
-          <div class="w-8 h-8 rounded-full bg-green-400 flex items-center justify-center font-medium text-sm">AA</div>
-          <span>Ahron Alera</span>
-        </button>
+     <!-- Care Profiles Section -->
+     <div class="mb-8">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-white/60 text-  sm font-medium">Care Profiles</h2>
+        <span class="text-xs text-white/60 bg-white/10 px-2 py-0.5 rounded-full">{{ profiles|length }}/3</span>
       </div>
-      <a href="{{ url_for('care_profiles') }}" class="w-full block text-sm text-white/60 hover:text-white mt-2 text-left pl-2">+ Add Profiles</a>
+      <div class="space-y-2">
+        {% for profile in profiles %}
+          <form action="{{ url_for('switch_profile', profile_id=profile.id) }}" method="post">
+            <button type="submit" class="w-full flex items-center space-x-3 {% if session.get('active_profile_id')|int == profile.id %}bg-white/10{% endif %} rounded-lg p-2 hover:bg-white/20 transition">
+              <div class="w-8 h-8 rounded-full 
+                {% if loop.index % 3 == 0 %}bg-green-400{% elif loop.index % 3 == 1 %}bg-pink-400{% else %}bg-blue-400{% endif %} 
+                flex items-center justify-center font-medium text-sm">
+                {{ profile.care_recipient[:1] }}{{ profile.relationship[:1] }}
+              </div>
+              <span>{{ profile.care_recipient }}</span>
+            </button>
+          </form>
+        {% endfor %}
+      </div>
+      {% if profiles|length < 3 %}
+        <a href="{{ url_for('care_profiles') }}" class="w-full block text-sm text-white/60 hover:text-white mt-2 text-left pl-2"> + Add Profiles </a>
+      {% else %}
+        <a href="{{ url_for('care_profiles')}}" class="w-full block text-sm text-white/60 hover:text-white mt-2 text-left pl-2"> View Care Profiles </a>
+      {% endif %}
     </div>
 
     <!-- Main Menu -->
