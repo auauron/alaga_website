@@ -22,10 +22,13 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    fullname = db.Column(db.String(20), nullable=False)
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
 
 class RegisterForm(FlaskForm):
+    fullname = StringField('Fullname', validators=[InputRequired(), Length(
+        min=4, max=20)], render_kw={'placeholder': 'Fullname'}) 
     username = StringField('Username', validators=[InputRequired(), Length(
         min=4, max=20)], render_kw={'placeholder': 'Username'})  
     
@@ -94,16 +97,29 @@ def register():
     
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        new_user = User(username=form.username.data, password=hashed_password)
+        new_user = User(
+            fullname=form.fullname.data, 
+            username=form.username.data,
+            password=hashed_password
+        )
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
 # route for view profile
-@app.route('/viewprofile')
+def get_initials(name):
+    parts = name.strip().split()
+    initials = ''.join([p[0].upper() for p in parts if p])
+    return initials
+
+@app.route('/view_profile', methods=['GET', 'POST'])
+@login_required
 def view_profile():
-    return render_template('view_profile.html')
+    fullname = current_user.fullname
+    username = current_user.username
+    initials = get_initials(fullname)
+    return render_template('view_profile.html', fullname=fullname, username=username, initials=initials)
 
 
 @app.route('/start', methods=['GET', 'POST'])
@@ -129,6 +145,7 @@ def medications():
 @app.route('/health_records')
 def health_records():
     return render_template('health_records.html')
+
 
 if __name__ == '__main__':
     with app.app_context():

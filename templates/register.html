@@ -9,26 +9,14 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
-
 </head>
+
 <body class="flex items-center justify-center min-h-screen p-4">
     <div class="android-container">
-
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <div>9:41 AM</div>
-            <div class="status-icons">
-                <i class="fas fa-signal"></i>
-                <i class="fas fa-wifi"></i>
-                <i class="fas fa-battery-full"></i>
-            </div>
-        </div>
-
         <!-- Logo -->
         <div class="text-center mb-8 mt-6">
-                    <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="mx-auto h-32 w-32">
-                </div>                
-                
+            <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="mx-auto h-32 w-32">
+        </div>                
 
         <!-- Register Form -->
         <div class="px-6">
@@ -37,15 +25,22 @@
             <form method="POST" action="">
                 {{ form.hidden_tag() }}
 
+                <!-- Full Name Field -->
+                <div class="mb-4">
+                    {{ form.fullname(class="form-input", placeholder="Full Name") }}
+                </div>
 
+                <!-- Username Field -->
                 <div class="mb-4">
                     {{ form.username(class="form-input", placeholder="Username") }}
                 </div>
 
+                <!-- Password Field -->
                 <div class="mb-4">
                     {{ form.password(class="form-input", placeholder="Password") }}
                 </div>
 
+                <!-- Submit Button -->
                 {{ form.submit(class="btn btn-primary", value="Create Account") }}
             </form>
 
