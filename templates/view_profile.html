@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,6 +8,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon"/>
   <style>
@@ -25,33 +30,31 @@
   </style>
 </head>
 
-<body class="min-h-screen bg-gray-50 font-[Inter]">
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 font-[Inter] text-gray-900 dark:text-white">
 <div class="flex h-screen relative">
   <!-- Overlay -->
   <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden" onclick="toggleSidebar()"></div>
 
   <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar fixed md:static w-64 bg-[#BC6FB7] text-white p-6 flex flex-col h-full z-30">
-    <!-- Same sidebar as your code -->
+  <aside id="sidebar" class="sidebar fixed md:static w-64 bg-[#BC6FB7] dark:bg-[#8E57A0] text-white p-6 flex flex-col h-full z-30">
     <div class="flex flex-col items-start mb-8">
       <h1 class="text-3xl font-bold font-montserrat">Hi, {{ fullname.split(' ')[0] }}!</h1>
-      <p class="text-white-600 text-sm mt-2">You're doing a great job.<br> We're proud of you.</p>
+      <p class="text-white/80 text-sm mt-2">You're doing a great job.<br> We're proud of you.</p>
     </div>
 
     <!-- Care Profiles -->
     <div class="mb-8">
       <h2 class="text-white/80 text-sm font-medium mb-3">Care Profiles</h2>
-      <!-- (static buttons, you can make these dynamic later) -->
       <div class="space-y-2">
-        <button class="w-full flex items-center space-x-3 bg-white/10 rounded-lg p-2 hover:bg-white/20 transition">
+        <button class="w-full flex items-center space-x-3 bg-white/10 hover:bg-white/20 dark:hover:bg-white/30 rounded-lg p-2 transition">
           <div class="w-8 h-8 rounded-full bg-pink-400 flex items-center justify-center font-medium text-sm">MC</div>
           <span>Maria Clara</span>
         </button>
-        <button class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 transition">
+        <button class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 dark:hover:bg-white/20 transition">
           <div class="w-8 h-8 rounded-full bg-blue-400 flex items-center justify-center font-medium text-sm">LL</div>
           <span>Lemuel Luceno</span>
         </button>
-        <button class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 transition">
+        <button class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 dark:hover:bg-white/20 transition">
           <div class="w-8 h-8 rounded-full bg-green-400 flex items-center justify-center font-medium text-sm">AA</div>
           <span>Ahron Alera</span>
         </button>
@@ -63,16 +66,16 @@
     <nav class="flex-1">
       <h2 class="text-white/80 text-sm font-medium mb-3">Main Menu</h2>
       <div class="space-y-1">
-        <a href="{{ url_for('dashboard') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/20 transition">
+        <a href="{{ url_for('dashboard') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/20 dark:hover:bg-white/30 transition">
           <i class="fa-solid fa-house"></i><span>Home</span>
         </a>
-        <a href="{{ url_for('todo') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
+        <a href="{{ url_for('todo') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 dark:hover:bg-white/20 transition">
           <i class="fa-solid fa-list-check"></i><span>To do</span>
         </a>
-        <a href="{{ url_for('medications') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
+        <a href="{{ url_for('medications') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 dark:hover:bg-white/20 transition">
           <i class="fa-solid fa-pills"></i><span>Medications</span>
         </a>
-        <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 bg-white/10 rounded-lg p-3 hover:bg-white/10 transition">
+        <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 bg-white/10 hover:bg-white/20 dark:hover:bg-white/30 rounded-lg p-3 transition">
           <i class="fa-solid fa-notes-medical"></i><span>Health Records</span>
         </a>
       </div>
@@ -80,7 +83,7 @@
 
     <!-- User Profile -->
     <div class="mt-auto pt-4 border-t border-white/10">
-      <a href="{{ url_for('view_profile') }}" class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 transition">
+      <a href="{{ url_for('view_profile') }}" class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 dark:hover:bg-white/20 transition">
         <div class="w-8 h-8 rounded-full bg-indigo-400 flex items-center justify-center font-medium text-sm">{{ initials }}</div>
         <div class="text-left">
           <div class="text-sm font-medium">{{ fullname }}</div>
@@ -92,72 +95,76 @@
 
   <!-- Main Content -->
   <div class="flex-1 flex flex-col overflow-hidden">
-    <header class="bg-white py-3 px-6 shadow-sm flex items-center justify-between">
-      <div class="flex items-center">
-        <button onclick="toggleSidebar()" class="mr-4 md:hidden">
-          <i class="fa-solid fa-bars fa-lg text-indigo-400"></i>
-        </button>
-        <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="h-8 w-8 mr-2">
-        <h2 class="text-3xl font-bold text-[#BC6FB7]">Alaga</h2>
+    <header class="bg-white dark:bg-gray-800 py-3 px-6 shadow-sm flex items-center justify-between">
+  
+      <!-- Left: Logo and Title -->
+      <div class="flex items-center space-x-3">
+        <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="h-8 w-8">
+        <h2 class="text-3xl font-bold text-[#BC6FB7] dark:text-white">Alaga</h2>
       </div>
+    
+      <!-- Right: Dark mode button -->
+      <button onclick="toggleDarkMode()">
+        <i class="fas fa-moon text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 text-2xl"></i>
+      </button>
+    
     </header>
-
     <main class="flex-1 overflow-auto p-6">
-      <div class="bg-white rounded-xl shadow-sm p-8">
-        <h2 class="text-2xl font-semibold text-indigo-900 mb-6">Edit Your Profile</h2>
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8">
+        <h2 class="text-2xl font-semibold text-indigo-900 dark:text-white mb-6">Edit Your Profile</h2>
 
         <!-- Profile Form -->
         <form method="POST" action="{{ url_for('view_profile') }}" class="space-y-6">
 
           <!-- Profile Picture -->
           <div class="flex justify-center">
-            <div class="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-              <div class="text-2xl font-semibold text-purple-600">{{ initials }}</div>
+            <div class="w-24 h-24 rounded-full bg-purple-100 dark:bg-purple-300 flex items-center justify-center mb-4">
+              <div class="text-2xl font-semibold text-purple-600 dark:text-purple-800">{{ initials }}</div>
             </div>
           </div>
 
           <!-- Name -->
           <div>
-            <label for="name" class="block text-sm font-medium text-purple-600 mb-1">Name</label>
+            <label for="name" class="block text-sm font-medium text-purple-600 dark:text-purple-300 mb-1">Name</label>
             <input
               type="text"
               id="name"
               name="name"
               value="{{ fullname }}"
-              class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
           </div>
 
           <!-- Username -->
           <div>
-            <label for="username" class="block text-sm font-medium text-purple-600 mb-1">Username</label>
+            <label for="username" class="block text-sm font-medium text-purple-600 dark:text-purple-300 mb-1">Username</label>
             <input
               type="text"
               id="username"
               name="username"
               value="{{ username }}"
-              class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
           </div>
 
-          <!-- Password sample only -->
+          <!-- Password -->
           <div>
-            <label for="password" class="block text-sm font-medium text-purple-600 mb-1">Password (Leave blank if no change)</label>
+            <label for="password" class="block text-sm font-medium text-purple-600 dark:text-purple-300 mb-1">Password (Leave blank if no change)</label>
             <input type="password" id="password" name="password" placeholder="New Password"
-              class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+              class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
           </div>
 
           <!-- Buttons -->
           <div class="flex items-center justify-between pt-4">
             <div class="flex space-x-3">
-              <button type="submit" class="px-6 py-2 bg-[#BC6FB7] text-white font-semibold rounded-lg hover:bg-[#E57DDE] transition">
+              <button type="submit" class="px-6 py-2 bg-[#BC6FB7] hover:bg-[#E57DDE] text-white font-semibold rounded-lg transition">
                 Save Changes
               </button>
-              <a href="{{ url_for('dashboard') }}" class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+              <a href="{{ url_for('dashboard') }}" class="px-6 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-white rounded-lg transition">
                 Cancel
               </a>
             </div>
-            <a href="{{ url_for('logout') }}" class="px-6 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition">
+            <a href="{{ url_for('logout') }}" class="px-6 py-2 bg-red-100 hover:bg-red-200 dark:bg-red-400 dark:hover:bg-red-500 text-red-600 dark:text-white rounded-lg transition">
               Log Out
             </a>
           </div>
@@ -169,12 +176,17 @@
 </div>
 
 <script>
-function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('overlay');
-  sidebar.classList.toggle('open');
-  overlay.classList.toggle('hidden');
-}
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('hidden');
+  }
+  
+  function toggleDarkMode() {
+    const html = document.documentElement;
+    html.classList.toggle('dark');
+  }
 </script>
 
 </body>
