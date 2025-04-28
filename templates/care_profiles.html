@@ -299,8 +299,6 @@
         sidebar.classList.toggle('open');
         overlay.classList.toggle('hidden');
       }
-
-      // Delete modal functions
       function openDeleteModal(profileId) {
         const modal = document.getElementById('deleteModal');
         const deleteForm = document.getElementById('deleteForm');
@@ -312,8 +310,6 @@
         const modal = document.getElementById('deleteModal');
         modal.style.display = 'none';
       }
-
-      // Close modal if user clicks outside of it
       window.onclick = function(event) {
         const modal = document.getElementById('deleteModal');
         if (event.target == modal) {
