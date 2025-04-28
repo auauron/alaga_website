@@ -175,8 +175,8 @@
                     d="M12 4v16m8-8H4"/>
             </svg>
           </button>
-          
-          <!-- add a med modal -->
+
+          <!-- add med modal -->
         <div id="addMedicationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center">
           <div class="bg-white p-6 rounded-lg shadow-lg w-80">
             <h2 class="text-lg font-semibold mb-4">Add Medication</h2>
@@ -205,8 +205,12 @@
                 </select>
               </div>
               <div class="mb-2">
-                <label class="block text-sm font-medium text-gray-700">Date</label>
-                <input type="date" name="date" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                <label class="block text-sm font-medium text-gray-700">Start Date</label>
+                <input type="date" name="startDate" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+              </div>
+              <div class="mb-2">
+                <label class="block text-sm font-medium text-gray-700">End Date</label>
+                <input type="date" name="endDate" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
               </div>
               <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700">Time</label>
@@ -219,6 +223,7 @@
             </form>
           </div>
         </div>
+
 
 
 
