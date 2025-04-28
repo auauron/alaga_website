@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, url_for, redirect, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, login_required, logout_user, current_user, LoginManager
 from flask_wtf import FlaskForm
@@ -118,6 +118,23 @@ def get_initials(name):
 @app.route('/view_profile', methods=['GET', 'POST'])
 @login_required
 def view_profile():
+    if request.method == 'POST':
+        new_fullname = request.form.get('name')
+        new_username = request.form.get('username')
+        new_password = request.form.get('password')
+
+        # Update the current user's fullname and username
+        current_user.fullname = new_fullname
+        current_user.username = new_username
+
+        # Only update password if a new password was entered
+        if new_password:
+            hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+            current_user.password = hashed_password
+        
+        db.session.commit()
+        return redirect(url_for('view_profile'))
+
     fullname = current_user.fullname
     username = current_user.username
     initials = get_initials(fullname)
