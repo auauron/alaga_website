@@ -132,5 +132,55 @@
               </div>
             </div>
           </div>  
+
+
+            <!-- Medications -->
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+              <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-white">Medications to take</h2>
+                <a href="{{ url_for('medications') }}" class="text-white text-sm font-bold hover:text-indigo-800 transition">View All</a>  
+              </div>
+              <div class="divide-y divide-gray-100">
+                <div class="p-4 flex items-center justify-between transition hover:bg-gray-50">
+                  <div class="flex items-start">
+                    <div class="bg-blue-100 p-2 rounded-full mr-3">
+                      <i class="fa-solid fa-tablets" style="color: #000000;"></i>
+                    </div>
+                    <div>
+                      <h3 class="font-medium text-gray-900">Metformin</h3>
+                      <p class="text-sm text-gray-600">10 mg</p>
+                      <p class="text-xs text-gray-500">To take every morning</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="flex items-center mr-4 text-gray-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      <span class="text-sm">6:00 AM</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+    <script>
+      function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('hidden');
+      }
+
+      // Function to format the date as "Month Day, Year"
+      function formatDate(date) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+      }
+
+      // Get today's date and update the span
+      const today = new Date();
+      document.getElementById('todaysDate').textContent = `Today's date: ${formatDate(today)}`;
+
+    </script>
   </body>
 </html>
