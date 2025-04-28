@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, request
+from flask import Flask, render_template, url_for, redirect, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, login_required, logout_user, current_user, LoginManager
 from flask_wtf import FlaskForm
@@ -54,6 +54,14 @@ class LoginForm(FlaskForm):
 
     submit = SubmitField('Login') 
         
+class CareProfile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    care_recipient = db.Column(db.String(50), nullable=False)  # who you care for
+    relationship = db.Column(db.String(50), nullable=False)    # relationship to them
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    user = db.relationship('User', backref='profiles')
+
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -80,13 +88,34 @@ def login():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    if current_user.is_authenticated:
-        fullname = current_user.fullname
-        initials = get_initials(fullname)
-        return render_template('dashboard.html', fullname=fullname, initials=initials)
-    else:
-        return redirect(url_for('login'))
+    # Get all profiles for the sidebar
+    profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
     
+    # Get active profile if one is selected
+    profile_id = session.get('active_profile_id')
+    active_profile = None
+    
+    if profile_id:
+        active_profile = CareProfile.query.get(profile_id)
+        if active_profile and active_profile.user_id == current_user.id:
+            # Using the care recipient's name for the dashboard
+            fullname = current_user.fullname  # Keep user's name in the sidebar
+            initials = get_initials(fullname)
+            return render_template('dashboard.html', 
+                                  fullname=fullname, 
+                                  initials=initials, 
+                                  profiles=profiles, 
+                                  active_profile=active_profile)
+
+    # fallback if no profile selected
+    fullname = current_user.fullname
+    initials = get_initials(fullname)
+    return render_template('dashboard.html', 
+                          fullname=fullname, 
+                          initials=initials, 
+                          profiles=profiles, 
+                          active_profile=None)
+
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
@@ -108,6 +137,10 @@ def register():
         db.session.commit()
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
+
+@app.context_processor
+def utility_processor():
+    return dict(get_initials=get_initials)
 
 # route for view profile
 def get_initials(name):
@@ -158,9 +191,35 @@ def todo():
 @app.route('/care_profiles', methods=['GET', 'POST'])
 @login_required
 def care_profiles():
+    # Get existing profiles
+    profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+    
+    if request.method == 'POST':
+        # Check if user has reached the profile limit (3)
+        if len(profiles) >= 3:
+            flash('You have reached the maximum number of care profiles (3). Please upgrade your subscription to add more profiles.', 'warning')
+            return redirect(url_for('care_profiles'))
+            
+        care_recipient = request.form['care_recipient']
+        relationship = request.form['relationship']
+
+        new_profile = CareProfile(
+            care_recipient=care_recipient,
+            relationship=relationship,
+            user_id=current_user.id
+        )
+
+        db.session.add(new_profile)
+        db.session.commit()
+        
+        # Automatically set this as the active profile
+        session['active_profile_id'] = new_profile.id
+        return redirect(url_for('dashboard'))
+
+    # For GET requests, show the care profiles page
     fullname = current_user.fullname
     initials = get_initials(fullname)
-    return render_template('care_profiles.html', fullname=fullname, initials=initials)
+    return render_template('care_profiles.html', profiles=profiles, fullname=fullname, initials=initials)
 
 #route for medications page
 @app.route('/medications', methods=['GET', 'POST'])
@@ -178,6 +237,14 @@ def health_records():
     initials = get_initials(fullname)
     return render_template('health_records.html', fullname=fullname, initials=initials)
 
+
+@app.route('/switch_profile/<int:profile_id>', methods=['POST'])
+@login_required
+def switch_profile(profile_id):
+    selected_profile = CareProfile.query.filter_by(id=profile_id, user_id=current_user.id).first()
+    if selected_profile:
+        session['active_profile_id'] = profile_id
+    return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
     with app.app_context():
