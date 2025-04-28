@@ -81,12 +81,10 @@ def login():
 @login_required
 def dashboard():
     if current_user.is_authenticated:
-        fullname = current_user.fullname
-        initials = get_initials(fullname)
-        return render_template('dashboard.html', fullname=fullname, initials=initials)
+        return render_template('dashboard.html', name=current_user.username)
     else:
         return redirect(url_for('login'))
-    
+
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
@@ -147,36 +145,23 @@ def start():
 
 #route for to do page
 @app.route('/todo', methods=['GET', 'POST'])
-@login_required
 def todo():
-    fullname = current_user.fullname
-    initials = get_initials(fullname)
-    return render_template('todo.html', fullname=fullname, initials=initials)
-
+    return render_template('todo.html')
 
 # route for care profiles page
 @app.route('/care_profiles', methods=['GET', 'POST'])
-@login_required
 def care_profiles():
-    fullname = current_user.fullname
-    initials = get_initials(fullname)
-    return render_template('care_profiles.html', fullname=fullname, initials=initials)
+    return render_template('care_profiles.html')
 
 #route for medications page
-@app.route('/medications', methods=['GET', 'POST'])
-@login_required
+@app.route('/medications')
 def medications():
-    fullname = current_user.fullname
-    initials = get_initials(fullname)
-    return render_template('medications.html', fullname=fullname, initials=initials)
+    return render_template('medications.html')
 
 #route for health records page
-@app.route('/health_records', methods=['GET', 'POST'])
-@login_required
+@app.route('/health_records')
 def health_records():
-    fullname = current_user.fullname
-    initials = get_initials(fullname)
-    return render_template('health_records.html', fullname=fullname, initials=initials)
+    return render_template('health_records.html')
 
 
 if __name__ == '__main__':
