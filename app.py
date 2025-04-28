@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, request, session
+from flask import Flask, render_template, url_for, redirect, request, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, login_required, logout_user, current_user, LoginManager
 from flask_wtf import FlaskForm
@@ -158,7 +158,9 @@ def care_profiles():
     if request.method == 'POST':
         # Check if user has reached the profile limit (3)
         if len(profiles) >= 3:
+            flash('You have reached the maximum number of care profiles (3). Please upgrade your subscription to add more profiles.', 'warning')
             return redirect(url_for('care_profiles'))
+        
             
         care_recipient = request.form['care_recipient']
         relationship = request.form['relationship']
@@ -180,6 +182,44 @@ def care_profiles():
     fullname = current_user.fullname
     initials = get_initials(fullname)
     return render_template('care_profiles.html', profiles=profiles, fullname=fullname, initials=initials)
+
+@app.route('/edit_profile/<int:profile_id>', methods=['GET', 'POST'])
+@login_required
+def edit_profile(profile_id):
+    # Get the profile to edit
+    profile = CareProfile.query.filter_by(id=profile_id, user_id=current_user.id).first_or_404()
+    
+    # Get all profiles for the sidebar
+    profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+    
+    if request.method == 'POST':
+        # Update the profile with new data
+        profile.care_recipient = request.form.get('care_recipient')
+        profile.relationship = request.form.get('relationship')
+        
+        db.session.commit()
+        return redirect(url_for('care_profiles'))
+    
+    # For GET requests, show the edit form
+    fullname = current_user.fullname
+    initials = get_initials(fullname)
+    return render_template('edit_profile.html', profile=profile, profiles=profiles, fullname=fullname, initials=initials)
+
+@app.route('/delete_profile/<int:profile_id>', methods=['POST'])
+@login_required
+def delete_profile(profile_id):
+    # Get the profile to delete
+    profile = CareProfile.query.filter_by(id=profile_id, user_id=current_user.id).first_or_404()
+    
+    # If this is the active profile, clear the active profile from session
+    if session.get('active_profile_id') == profile_id:
+        session.pop('active_profile_id', None)
+    
+    # Delete the profile
+    db.session.delete(profile)
+    db.session.commit()
+    
+    return redirect(url_for('care_profiles'))
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
