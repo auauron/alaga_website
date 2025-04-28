@@ -66,6 +66,10 @@ class CareProfile(db.Model):
 def home():
     return render_template('home.html')
 
+@app.route('/start', methods=['GET', 'POST'])
+def start():
+    return render_template('start.html')
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -84,37 +88,6 @@ def login():
     if form.errors:
         return render_template('login.html', form=form, error=form.errors)
     return render_template('login.html', form=form)
-
-@app.route('/dashboard', methods=['GET', 'POST'])
-@login_required
-def dashboard():
-    # Get all profiles for the sidebar
-    profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
-    
-    # Get active profile if one is selected
-    profile_id = session.get('active_profile_id')
-    active_profile = None
-    
-    if profile_id:
-        active_profile = CareProfile.query.get(profile_id)
-        if active_profile and active_profile.user_id == current_user.id:
-            # Using the care recipient's name for the dashboard
-            fullname = current_user.fullname  # Keep user's name in the sidebar
-            initials = get_initials(fullname)
-            return render_template('dashboard.html', 
-                                  fullname=fullname, 
-                                  initials=initials, 
-                                  profiles=profiles, 
-                                  active_profile=active_profile)
-
-    # fallback if no profile selected
-    fullname = current_user.fullname
-    initials = get_initials(fullname)
-    return render_template('dashboard.html', 
-                          fullname=fullname, 
-                          initials=initials, 
-                          profiles=profiles, 
-                          active_profile=None)
 
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
@@ -151,6 +124,9 @@ def get_initials(name):
 @app.route('/view_profile', methods=['GET', 'POST'])
 @login_required
 def view_profile():
+
+    profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+
     if request.method == 'POST':
         new_fullname = request.form.get('name')
         new_username = request.form.get('username')
@@ -171,22 +147,7 @@ def view_profile():
     fullname = current_user.fullname
     username = current_user.username
     initials = get_initials(fullname)
-    return render_template('view_profile.html', fullname=fullname, username=username, initials=initials)
-
-
-@app.route('/start', methods=['GET', 'POST'])
-def start():
-    return render_template('start.html')
-
-#route for to do page
-@app.route('/todo', methods=['GET', 'POST'])
-@login_required
-def todo():
-    fullname = current_user.fullname
-    initials = get_initials(fullname)
-    return render_template('todo.html', fullname=fullname, initials=initials)
-
-
+    return render_template('view_profile.html', fullname=fullname, username=username, initials=initials, profiles=profiles)
 # route for care profiles page
 @app.route('/care_profiles', methods=['GET', 'POST'])
 @login_required
@@ -197,7 +158,6 @@ def care_profiles():
     if request.method == 'POST':
         # Check if user has reached the profile limit (3)
         if len(profiles) >= 3:
-            flash('You have reached the maximum number of care profiles (3). Please upgrade your subscription to add more profiles.', 'warning')
             return redirect(url_for('care_profiles'))
             
         care_recipient = request.form['care_recipient']
@@ -221,21 +181,90 @@ def care_profiles():
     initials = get_initials(fullname)
     return render_template('care_profiles.html', profiles=profiles, fullname=fullname, initials=initials)
 
+@app.route('/dashboard', methods=['GET', 'POST'])
+@login_required
+def dashboard():
+    # Get all profiles for the sidebar
+    profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+    
+    # Get active profile if one is selected
+    profile_id = session.get('active_profile_id')
+    active_profile = None
+    
+    if profile_id:
+        active_profile = CareProfile.query.get(profile_id)
+        if active_profile and active_profile.user_id == current_user.id:
+            # Using the care recipient's name for the dashboard
+            fullname = current_user.fullname  # Keep user's name in the sidebar
+            initials = get_initials(fullname)
+            return render_template('dashboard.html', 
+                                  fullname=fullname, 
+                                  initials=initials, 
+                                  profiles=profiles, 
+                                  active_profile=active_profile)
+
+    # fallback if no profile selected
+    fullname = current_user.fullname
+    initials = get_initials(fullname)
+    return render_template('dashboard.html', 
+                          fullname=fullname, 
+                          initials=initials, 
+                          profiles=profiles, 
+                          active_profile=None)
+
+#route for to do page
+@app.route('/todo', methods=['GET', 'POST'])
+@login_required
+def todo():
+
+    profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+    
+    profile_id = session.get('active_profile_id')
+    active_profile = None
+    
+    if profile_id:
+        active_profile = CareProfile.query.get(profile_id)
+    
+    fullname = current_user.fullname
+    initials = get_initials(fullname)
+    return render_template('todo.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile)
+
 #route for medications page
 @app.route('/medications', methods=['GET', 'POST'])
 @login_required
 def medications():
+    # Get all profiles for the sidebar
+    profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+    
+    # Get active profile if one is selected
+    profile_id = session.get('active_profile_id')
+    active_profile = None
+    
+    if profile_id:
+        active_profile = CareProfile.query.get(profile_id)
+    
     fullname = current_user.fullname
     initials = get_initials(fullname)
-    return render_template('medications.html', fullname=fullname, initials=initials)
+    return render_template('medications.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile)
 
 #route for health records page
 @app.route('/health_records', methods=['GET', 'POST'])
 @login_required
 def health_records():
+    # Get all profiles for the sidebar
+    profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+    
+    # Get active profile if one is selected
+    profile_id = session.get('active_profile_id')
+    active_profile = None
+    
+    if profile_id:
+        active_profile = CareProfile.query.get(profile_id)
+    
     fullname = current_user.fullname
     initials = get_initials(fullname)
-    return render_template('health_records.html', fullname=fullname, initials=initials)
+    return render_template('health_records.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile)
+
 
 
 @app.route('/switch_profile/<int:profile_id>', methods=['POST'])
