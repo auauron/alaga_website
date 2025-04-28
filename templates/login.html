@@ -9,19 +9,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon"/>
-    <link rel="stylesheet" href ="{{ url_for('static', filename='login.css') }}">   
+    <link rel="stylesheet" href ="{{ url_for('static', filename='login_register.css') }}">   
 </head>
 
 <body class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-lg text-center">
-        
+    <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-lg text-center h-full flex flex-col justify-center">
+
         <!-- Logo and Title -->
         <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="mx-auto h-24 mb-6">
         <h2 class="text-2xl font-bold text-[#c77dbd] mb-2">Welcome Back</h2>
         <p class="text-gray-600 mb-8">Please log in to continue managing your caregiving journey.</p>
         
         <!-- Form -->
-        <form method="POST" action="" class="space-y-4">
+        <form method="POST" action="" class="space-y-6">
             {{ form.hidden_tag() }}
             
             <div class="text-left">
