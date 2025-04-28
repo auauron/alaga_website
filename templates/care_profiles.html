@@ -15,35 +15,65 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
     <div class="android-container">
-        <!-- Android Status Bar -->
-        <div class="status-bar">
-            <span>9:41</span>
-            <div class="status-icons">
-                <i class="fa-solid fa-wifi"></i>
-                <i class="fa-solid fa-signal"></i>
-                <i class="fa-solid fa-battery-three-quarters"></i>
-            </div>
-        </div>
-        
         <div class="p-6 flex flex-col h-[calc(100%-96px)] overflow-auto">
             <div class="care-header">
-                <h2 class="text-xl font-bold">Your first care.</h2>
-                <p class="text-sm mt-1">Caring starts with understanding. Tell us a little about your loved one or “inaalagaan” so we can support you best..</p>
+                <h2 class="text-xl font-bold">Your care profiles</h2>
+                <p class="text-sm mt-1">Caring starts with understanding. Tell us about your loved ones so we can support you best.</p>
+            </div>
+        
+            
+            <!-- Profile count indicator -->
+            <div class="mb-4 flex items-center justify-between">
+                <span class="text-sm font-medium">Care Profiles</span>
+                <span class="text-sm bg-gray-100 px-2 py-1 rounded-full">{{ profiles|length }}/3 
+                    {% if profiles|length >= 3 %}
+                        <span class="text-xs text-gray-500">(Max)</span>
+                    {% endif %}
+                </span>
             </div>
             
-            <form method="POST" action="{{ url_for('dashboard') }}">
-                <div class="mb-4">
-                    <label class="form-label">Who are you caring for?</label>
-                    <input type="text" name="care_recipient" class="form-input" placeholder="Enter name here">
+            {% if profiles %}
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2">Your Care Profiles</h3>
+                    <ul class="space-y-2">
+                        {% for profile in profiles %}
+                        <li class="p-2 border rounded flex items-center justify-between">
+                            <div>
+                                <strong>{{ profile.care_recipient }}</strong><br>
+                                <small>{{ profile.relationship }}</small>
+                            </div>
+                            <form method="POST" action="{{ url_for('switch_profile', profile_id=profile.id) }}">
+                                <button type="submit" class="text-blue-500 hover:underline text-sm">Switch</button>
+                            </form>
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </div>
-                
-                <div class="mb-4">
-                    <label class="form-label">And your relationship to them?</label>
-                    <input type="text" name="relationship" class="form-input" placeholder="Caregiver, parent, grandchild, etc.">
+            {% endif %}
+            
+            <!-- Show form only if under the limit -->
+            {% if profiles|length < 3 %}
+                <form method="POST" action="{{ url_for('care_profiles') }}">
+                    <div class="mb-4">
+                        <label class="form-label">Who are you caring for?</label>
+                        <input type="text" name="care_recipient" class="form-input" placeholder="Enter name here" required value="{{ request.form.get('care_recipient', '') }}">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">And your relationship to them?</label>
+                        <input type="text" name="relationship" class="form-input" placeholder="Caregiver, parent, grandchild, etc." required value="{{ request.form.get('relationship', '') }}">
+                    </div>
+                    
+                    <button type="submit" class="android-btn android-btn-secondary">Add Care Profile</button>
+                </form>
+            {% else %}
+                <!-- Subscription upgrade prompt -->
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+                    <h3 class="font-medium text-lg mb-2">Upgrade to Premium</h3>
+                    <p class="text-gray-600 mb-4">You've reached the maximum of 3 care profiles. Upgrade to our premium plan to add unlimited profiles.</p>
+                    <a href="#" class="android-btn android-btn-primary">Upgrade Now</a>
                 </div>
-                
-                <button type="submit" class="android-btn android-btn-secondary">Set-up Care Profile</button>
-            </form>
+            {% endif %}
             
             <div class="text-center mt-4">
                 <a href="{{ url_for('dashboard') }}" class="text-gray-500 text-sm hover:underline">Back to Home</a>
