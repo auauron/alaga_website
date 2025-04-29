@@ -82,7 +82,7 @@
         <a href="{{ url_for('medications') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 dark:hover:bg-white/20 transition">
           <i class="fa-solid fa-pills"></i><span>Medications</span>
         </a>
-        <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 bg-white/10 hover:bg-white/20 dark:hover:bg-white/30 rounded-lg p-3 transition">
+        <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 dark:hover:bg-white/20 transition">
           <i class="fa-solid fa-notes-medical"></i><span>Health Records</span>
         </a>
       </div>
@@ -90,7 +90,7 @@
 
     <!-- User Profile -->
     <div class="mt-auto pt-4 border-t border-white/10">
-      <a href="{{ url_for('view_profile') }}" class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 dark:hover:bg-white/20 transition">
+      <a href="{{ url_for('view_profile') }}" class="w-full flex items-center space-x-3 bg-white/10 rounded-lg p-2 hover:bg-white/10 transition">
         <div class="w-8 h-8 rounded-full bg-indigo-400 flex items-center justify-center font-medium text-sm">{{ initials }}</div>
         <div class="text-left">
           <div class="text-sm font-medium">{{ fullname }}</div>

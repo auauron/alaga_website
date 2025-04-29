@@ -69,9 +69,8 @@
           <h2 class="text-white/80 text-sm font-medium mb-3">Main Menu</h2>
           <div class="space-y-1">
             <!--Home-->
-            <a href="{{ url_for('dashboard') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/20 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              <span>Home</span>
+            <a href="{{ url_for('dashboard') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/20 dark:hover:bg-white/30 transition">
+              <i class="fa-solid fa-house"></i><span>Home</span>
             </a>
             <!--To do-->
             <a href="{{ url_for('todo') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
@@ -84,10 +83,8 @@
               <span>Medications</span>
             </a>
             <!--Health Records-->
-            <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-              <span>Health Records</span>
-            </a>
+            <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 dark:hover:bg-white/20 transition">
+              <i class="fa-solid fa-notes-medical"></i><span>Health Records</span>
           </div>
         </nav>
 

@@ -111,15 +111,15 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
-@app.context_processor
-def utility_processor():
-    return dict(get_initials=get_initials)
-
 # route for view profile
 def get_initials(name):
     parts = name.strip().split()
     initials = ''.join([p[0].upper() for p in parts if p])
     return initials
+
+@app.context_processor
+def utility_processor():
+    return dict(get_initials=get_initials)
 
 @app.route('/view_profile', methods=['GET', 'POST'])
 @login_required
@@ -148,15 +148,15 @@ def view_profile():
     username = current_user.username
     initials = get_initials(fullname)
     return render_template('view_profile.html', fullname=fullname, username=username, initials=initials, profiles=profiles)
+
 # route for care profiles page
 @app.route('/care_profiles', methods=['GET', 'POST'])
 @login_required
 def care_profiles():
-    # Get existing profiles
+    
     profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
     
     if request.method == 'POST':
-        # Check if user has reached the profile limit (3)
         if len(profiles) >= 3:
             flash('You have reached the maximum number of care profiles (3). Please upgrade your subscription to add more profiles.', 'warning')
             return redirect(url_for('care_profiles'))
