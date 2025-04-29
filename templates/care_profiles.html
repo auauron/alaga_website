@@ -144,9 +144,8 @@
           <h2 class="text-white/80 text-sm font-medium mb-3">Main Menu</h2>
           <div class="space-y-1">
             <!--Home-->
-            <a href="{{ url_for('dashboard') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/20 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              <span>Home</span>
+            <a href="{{ url_for('dashboard') }}" class="flex items-center space-x-3  rounded-lg p-3 hover:bg-white/20 dark:hover:bg-white/30 transition">
+              <i class="fa-solid fa-house"></i><span>Home</span>
             </a>
             <!--To do-->
             <a href="{{ url_for('todo') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
@@ -159,9 +158,8 @@
               <span>Medications</span>
             </a>
             <!--Health Records-->
-            <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-              <span>Health Records</span>
+            <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 dark:hover:bg-white/20 transition">
+              <i class="fa-solid fa-notes-medical"></i><span>Health Records</span>
             </a>
           </div>
         </nav>
@@ -194,20 +192,19 @@
             </button>
           </div>
         </header>
-
-<div class="max-w-4xl mx-auto">
-  <div class="bg-white p-6 rounded-lg shadow-md">
-    <div class="mb-6">
-      <h2 class="text-xl font-bold text-[#BC6FB7]">Your Care Profiles</h2>
-      <p class="text-sm text-gray-600 mt-1">Caring starts with understanding. Tell us about your loved ones so we can support you best.</p>
-    </div>
+  
+      <main class="flex-1 overflow-y-auto p-6">
+        <div class="max-w-4xl mx-auto">
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="mb-6">
+              <h2 class="text-3xl font-medium text-[#BC6FB7]">Care Profiles</h2>
+              <p class="text-sm text-gray-600 mt-1">Caring starts with understanding. Tell us about your loved ones so we can support you best.</p>
+            </div>
               <!-- Profile count indicator -->
-              <div class="mb-4 flex items-center justify-between">
-                <span class="text-sm font-medium">Care Profiles</span>
-                <span class="text-sm bg-gray-100 px-2 py-1 rounded-full">{{ profiles|length }}/3 
-                  {% if profiles|length >= 3 %}
-                    <span class="text-xs text-gray-500">(Max)</span>
-                  {% endif %}
+              <div class="mb-4 flex justify-end items-center space-x-2">
+                <h2 class="text-sm font-medium">Care Profiles</h2>
+                <span class="text-sm bg-gray-100 px-2 py-1 rounded-full">
+                  {{ profiles|length }}/3
                 </span>
               </div>
               
