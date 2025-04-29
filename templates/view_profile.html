@@ -19,31 +19,17 @@
 </head>
 
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900 font-[Inter] text-gray-900 dark:text-white">
-<div class="flex flex-col md:flex-row min-h-screen relative">
+<div class="flex h-screen relative overflow-x-auto">
 
   <!-- Overlay -->
-  <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden" onclick="toggleSidebar()"></div>
+  <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden" onclick="toggleSidebar()"></div>
 
   <!-- Include the sidebar -->
   {% include 'includes/sidebar.html' %}
 
   <!-- Main Content -->
   <div class="flex-1 flex flex-col overflow-hidden">
-    <header class="bg-white dark:bg-gray-800 py-3 px-4 sm:px-6 shadow-sm flex items-center justify-between">
-      <!-- Left: Mobile toggle + Logo -->
-      <div class="flex items-center space-x-3">
-        <button class="md:hidden text-[#BC6FB7] dark:text-white text-2xl" onclick="toggleSidebar()">
-          <i class="fas fa-bars"></i>
-        </button>
-        <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="h-8 w-8">
-        <h2 class="text-3xl font-bold text-[#BC6FB7] dark:text-white">Alaga</h2>
-      </div>
-
-      <!-- Right: Dark mode button -->
-      <button onclick="toggleDarkMode()">
-        <i class="fas fa-moon text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 text-2xl"></i>
-      </button>
-    </header>
+    {% include 'includes/header.html' %}
 
     <main class="flex-1 overflow-auto p-4 sm:p-6">
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 sm:p-8">
@@ -57,7 +43,7 @@
           </div>
 
           <div>
-            <label for="name" class="block text-sm font-medium text-purple-600 dark:text-purple-300 mb-1">Name</label>
+            <label for="name" class="block text-sm font-medium text-purple-600 dark:text-purple-300 mb-1">Name (First name, Last name)</label>
             <input type="text" id="name" name="name" value="{{ fullname }}" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
           </div>
 
@@ -74,7 +60,7 @@
           <div class="flex items-center justify-between pt-4 flex-wrap gap-2">
             <div class="flex space-x-3">
               <button type="submit" class="px-6 py-2 bg-[#BC6FB7] hover:bg-[#E57DDE] text-white font-semibold rounded-lg transition">Save Changes</button>
-              <a href="{{ url_for('dashboard') }}" class="px-6 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-white rounded-lg transition">Cancel</a>
+              <a href="{{ url_for('dashboard') }}" class="px-6 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-white rounded-lg transition">Back</a>
             </div>
             <a href="{{ url_for('logout') }}" class="px-6 py-2 bg-red-100 hover:bg-red-200 dark:bg-red-400 dark:hover:bg-red-500 text-red-600 dark:text-white rounded-lg transition">Log Out</a>
           </div>
