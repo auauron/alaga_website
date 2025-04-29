@@ -9,8 +9,49 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="shortcut icon" href="../static/images/favicon.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon"/>
     {% include 'includes/sidebar_styles.html' %}
+    <style>
+      .sidebar {
+        transition: transform 0.3s ease-in-out;
+      }
+      
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+      }
+      input[type="checkbox"]:checked::before {
+        content: '\2713';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 16px;
+        color: white;
+      }
+
+      input[type="checkbox"]:checked + label .task-text {
+        text-decoration: line-through;
+        color: gray;
+      }
+
+      .card.editing .delete-btn {
+        display: inline-block;
+      }
+      
+      .task-card {
+        animation: fadeIn 0.3s ease-in-out;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
   </head>
   <body class="min-h-screen bg-gray-50 font-[Inter]">
     <div class="flex h-screen relative">
@@ -20,16 +61,33 @@
       <!-- Sidebar -->
       {% include 'includes/sidebar.html' %}
 
-      <!-- HERE -->
+      <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden">
-        {% include 'includes/header.html' %}
+        <header class="bg-white py-3 px-6 shadow-sm flex items-center justify-between">
+          <div class="flex items-center">
+            <button onclick="toggleSidebar()" class="mr-4 md:hidden">
+              <i class="fa-solid fa-bars fa-lg" style="color: #8491d3;"></i>
+            </button>
+            <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="h-8 w-8 mr-2">
+            <h2 class="text-3xl font-bold text-[#BC6FB7]">Alaga</h2>
+          </div>
+          <div class="flex items-center space-x-4">
+            <button class="text-gray-500 hover:text-gray-700">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            </button>
+          </div>
+        </header>
 
         <main class="flex-1 overflow-auto p-6">
           <!-- TO DO -->
           <div class="mb-6">
             <div class="mb-2"> 
               <h2 class="text-4xl font-bold text-[#596BC7]">To do</h2>
-              <p class="text-gray-600 text-sm">&nbsp;Here's what you need to do for Maria Clara.</p>
+              {% if active_profile %}
+              <p class="text-gray-600 text-sm">&nbsp;Here's what we need to do for {{ active_profile.care_recipient }}.</p>
+              {% else %}
+              <p class="text-gray-600 text-sm">&nbsp;Here's what we need to do for your care recipient.</p>
+              {% endif %}
             </div>
             <div class="bg-gradient-to-r from-pink-400 to-purple-500 rounded-lg shadow-sm p-4 text-white flex items-center justify-between">
               <div class="flex items-center">
@@ -44,330 +102,171 @@
             </div>
           </div>  
 
-<!--card today-->
-
-        <div class="card bg-white rounded-lg shadow-md overflow-hidden mb-6">
-          <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
-            <h2 class="text-lg font-bold text-white">Today</h2>
-            <button type="button" class="edit-btn text-white text-sm font-bold hover:text-indigo-800 transition">Edit</button>
+          <!-- Buttons: Edit -->
+          <div class="flex justify-end space-x-3 mb-4">
+            <button id="editTasksBtn" class="px-4 py-2 bg-indigo-300 text-white rounded hover:bg-indigo-400 transition-colors">
+              Edit
+            </button>
           </div>
-          <div class="p-4">
-            <ul class="space-y-3">
-              <li class="flex items-center justify-between">
-                <!-- Custom Circular Checkbox -->
-                <div class="flex items-center">
-                  <input type="checkbox" id="task1" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative"/>
-                  <label for="task1" class="ml-3 text-gray-800">Appointment with Doc Yu at 7:00 AM</label>
-                </div>
-                <!--delete a to do button-->
-                <button type="button" class="delete-btn hidden hover:text-red-700 leading-none">
-                  <i class="fa-solid fa-trash text-red-500 text-xl"></i>
-                </button>
-              </li>
-              <li class="flex items-center justify-between">
-                <!-- Custom Circular Checkbox -->
-                <div class="flex items-center">
-                  <input type="checkbox" id="task2" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative"/>
-                  <label for="task2" class="ml-3 text-gray-800">Buy Metformin 1 stub.</label>
-                </div>
-                <!--delete a to do button-->
-                <button type="button" class="delete-btn hidden hover:text-red-700 leading-none">
-                  <i class="fa-solid fa-trash text-red-500 text-xl"></i>
-                </button>
-              </li>
-            </ul>
-          </div>
-        </div>
 
-
-
-          <!--tomorrow -->
-        <div class="card bg-white rounded-lg shadow-md overflow-hidden mb-6">
-          <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
-            <h2 class="text-lg font-bold text-white">Tomorrow</h2>
-            <button type="button" class="edit-btn text-white text-sm font-bold hover:text-indigo-800 transition">Edit</button>
-          </div>
-          <div class="p-4">
-            <ul class="space-y-3">
-              <li class="flex items-center justify-between">
-                <!-- Custom Circular Checkbox -->
-                <div class="flex items-center">
-                  <input type="checkbox" id="task1" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative"/>
-                  <label for="task1" class="ml-3 text-gray-800">Buy facemasks</label>
-                </div>
-                <!--delete a to do button-->
-                <button type="button" class="delete-btn hidden hover:text-red-700 leading-none">
-                  <i class="fa-solid fa-trash text-red-500 text-xl"></i>
-                </button>
-              </li>
-              <li class="flex items-center justify-between">
-                <!-- Custom Circular Checkbox -->
-                <div class="flex items-center">
-                  <input type="checkbox" id="task2" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative"/>
-                  <label for="task2" class="ml-3 text-gray-800">X-ray Appointment at 9 am</label>
-                </div>
-                <!--delete a to do button-->
-                <button type="button" class="delete-btn hidden hover:text-red-700 leading-none">
-                  <i class="fa-solid fa-trash text-red-500 text-xl"></i>
-                </button>
-              </li>
-            </ul>
-          </div>
-        </div>
-  
-
-        <!--Next next day... -->
-        <div class="card bg-white rounded-lg shadow-md overflow-hidden mb-6">
-          <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
-            <h2 class="text-lg font-bold text-white">April 23</h2>
-            <button type="button" class="edit-btn text-white text-sm font-bold hover:text-indigo-800 transition">Edit</button>
-          </div>
-          <div class="p-4">
-            <ul class="space-y-3">
-              <li class="flex items-center justify-between">
-                <!-- Custom Circular Checkbox -->
-                <div class="flex items-center">
-                  <input type="checkbox" id="task1" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative"/>
-                  <label for="task1" class="ml-3 text-gray-800">Take blood test.</label>
-                </div>
-                <!--delete a to do button-->
-                <button type="button" class="delete-btn hidden hover:text-red-700 leading-none">
-                  <i class="fa-solid fa-trash text-red-500 text-xl"></i>
-                </button>
-              </li>
-              <li class="flex items-center justify-between">
-                <!-- Custom Circular Checkbox -->
-                <div class="flex items-center">
-                  <input type="checkbox" id="task2" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative"/>
-                  <label for="task2" class="ml-3 text-gray-800">Visit PT at 2 pm.</label>
-                </div>
-                <!--delete a to do button-->
-                <button type="button" class="delete-btn hidden hover:text-red-700 leading-none">
-                  <i class="fa-solid fa-trash text-red-500 text-xl"></i>
-                </button>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-
-        <!-- add a to do button -->
-        <button id="openAddTodo" class="fixed bottom-6 right-6 bg-[#BC6FB7] hover:bg-[#E57DDE] text-white p-4 rounded-full shadow-lg transition-all">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-              viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 4v16m8-8H4"/>
-          </svg>
-        </button>
-
-              <!-- Add To-Do Modal -->
-        <div id="addTodoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div class="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 class="text-lg font-bold mb-4 text-[#BC6FB7]">What do you need to do?</h2>
-            <div class="mb-4">
-              <label class="block text-gray-700 mb-2">To do:</label>
-              <input type="text" id="newTodoText" class="w-full border rounded px-3 py-2" placeholder="Enter your task here..">
-            </div>
-
-            <div class="mb-4">
-              <label class="block text-gray-700 mb-2">Date:</label>
-              <select id="newTodoDate" class="w-full border rounded px-3 py-2">
-                <option value="Today">Today</option>
-                <option value="Tomorrow">Tomorrow</option>
-                <option value="Custom">Select Date</option> <!-- Custom option added -->
-              </select>
-              <!-- Date picker input, hidden by default -->
-              <input id="datePicker" type="date" class="w-full border rounded px-3 py-2 mt-2 hidden">
-            </div>
-
-            <div class="flex justify-end space-x-2">
-              <button id="cancelAddTodo" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded">Cancel</button>
-              <button id="saveAddTodo" class="bg-[#BC6FB7] hover:bg-[#E57DDE] text-white px-4 py-2 rounded">Save</button>
-            </div>
-          </div>
-        </div>
-
-      
-        
-        
-        <!-- styling the checkmark -->
-        <style>
-            input[type="checkbox"]:checked::before {
-              content: '\2713'; /* Unicode checkmark */
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
-              font-size: 16px;
-              color: white;
-            }
-
-            /* strikethrough when checked */
-            input[type="checkbox"]:checked + label {
-                text-decoration: line-through;
-                color: gray; /* change color to gray when struck through */
-            }
-
-              /* when a card has the "editing" class, show delete buttons */
-            .card.editing .delete-btn {
-              display: inline-block;
-            }
-
-        </style>
-
-        
-    {% include 'includes/sidebar_js.html' %}
-    <script>
-            // Function to format the date as "Month Day, Year"
-      function formatDate(date) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return date.toLocaleDateString('en-US', options);
-      }
-
-      // Get today's date and update the span
-      const today = new Date();
-      document.getElementById('todaysDate').textContent = `Today's date: ${formatDate(today)}`;
-
-
-      // Go to edit mode
-      document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const card = btn.closest('.card');
-          const isEditing = card.classList.toggle('editing');
-          btn.textContent = isEditing ? 'Done' : 'Edit';
-
-          const todos = card.querySelectorAll('li');
-          todos.forEach(todo => {
-            const label = todo.querySelector('label');
-            const checkbox = todo.querySelector('input[type="checkbox"]');
-            const deleteBtn = todo.querySelector('.delete-btn');
-
-            if (isEditing) {
-              label.setAttribute('contenteditable', 'true');  // Allow editing
-              checkbox.disabled = true;                      // Disable checkbox
-              deleteBtn.classList.remove('hidden');           // Show delete button
-            } else {
-              label.removeAttribute('contenteditable');       // Stop editing
-              checkbox.disabled = false;                     // Enable checkbox
-              deleteBtn.classList.add('hidden');               // Hide delete button
-            }
-          });
-        });
-      });
-
-      // Delete items
-      document.addEventListener('click', e => {
-        const delBtn = e.target.closest('.delete-btn');
-        if (!delBtn) return;
-        
-        const li = delBtn.closest('li');
-        if (li) li.remove();
-      });
-
-      
-
-                          // SOPHIAAA DITO KAAA KADTOOO
-
-      // Open the modal
-      document.getElementById('openAddTodo').addEventListener('click', () => {
-        document.getElementById('addTodoModal').classList.remove('hidden');
-        document.getElementById('datePicker').classList.add('hidden'); // Hide the date picker initially
-        document.getElementById('newTodoDate').value = 'Today'; // Default to "Today"
-      });
-
-      // Close the modal
-      document.getElementById('cancelAddTodo').addEventListener('click', () => {
-        document.getElementById('addTodoModal').classList.add('hidden');
-      });
-
-      // Toggle the visibility of the date picker input
-      document.getElementById('newTodoDate').addEventListener('change', (e) => {
-        const datePicker = document.getElementById('datePicker');
-        if (e.target.value === 'Custom') {
-          datePicker.classList.remove('hidden'); // Show the date picker
-        } else {
-          datePicker.classList.add('hidden'); // Hide the date picker
-        }
-      });
-
-      // Save the new to-do
-      document.getElementById('saveAddTodo').addEventListener('click', () => {
-        const text = document.getElementById('newTodoText').value.trim();
-        let date = '';
-
-        // Determine the date based on selection
-        if (document.getElementById('newTodoDate').value === 'Today') {
-          date = 'Today';
-        } else if (document.getElementById('newTodoDate').value === 'Tomorrow') {
-          date = 'Tomorrow';
-        } else if (document.getElementById('newTodoDate').value === 'Custom') {
-          date = document.getElementById('datePicker').value.trim(); // Get custom date from date picker
-        }
-
-        if (text === '') {
-          alert('Please enter a to do task.');
-          return;
-        }
-
-        if (date === '') {
-          alert('Please select a date.');
-          return;
-        }
-
-        // Find if there's already a card for the selected date
-        let card = Array.from(document.querySelectorAll('.card')).find(card => 
-          card.querySelector('h2').textContent.trim() === date
-        );
-
-        // If no card, CREATE a new card
-        if (!card) {
-          const mainContainer = document.querySelector('.flex-1.flex.flex-col.overflow-hidden');
-          const newCard = document.createElement('div');
-          newCard.className = 'card bg-white rounded-lg shadow-sm overflow-hidden mb-6';
-          newCard.innerHTML = `
+          <!-- Today's Tasks Card -->
+          <div class="card bg-white rounded-lg shadow-md overflow-hidden mb-6">
             <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
-              <h2 class="text-lg font-bold text-white">${date}</h2>
-              <button type="button" class="edit-btn text-white text-sm font-bold hover:text-indigo-800 transition">Edit</button>
+              <h2 class="text-lg font-bold text-white">Today</h2>
             </div>
-            <div class="p-4">
-              <ul class="space-y-3"></ul>
+            <div class="divide-y" id="today-tasks">
+              <div class="p-6 text-center text-gray-500" id="today-empty-state">
+                No tasks for today. Click the + button to add.
+              </div>
             </div>
-          `;
-          mainContainer.appendChild(newCard);
-
-          // Reattach edit button listener
-          attachEditListeners();
-
-          card = newCard;
-        }
-
-        const ul = card.querySelector('ul');
-        // Create the new task inside
-        const li = document.createElement('li');
-        li.className = 'flex items-center justify-between';
-        li.innerHTML = `
-          <div class="flex items-center">
-            <input type="checkbox" class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative" />
-            <label class="ml-3 text-gray-800">${text}</label>
           </div>
-          <button type="button" class="delete-btn hidden hover:text-red-700 leading-none">
-            <i class="fa-solid fa-trash text-red-500 text-xl"></i>
+
+          <!-- Tomorrow's Tasks Card -->
+          <div class="card bg-white rounded-lg shadow-md overflow-hidden mb-6">
+            <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
+              <h2 class="text-lg font-bold text-white">Tomorrow</h2>
+            </div>
+            <div class="divide-y" id="tomorrow-tasks">
+              <div class="p-6 text-center text-gray-500" id="tomorrow-empty-state">
+                No tasks for tomorrow. Click the + button to add.
+              </div>
+            </div>
+          </div>
+
+          <!-- Upcoming Tasks Card -->
+          <div class="card bg-white rounded-lg shadow-md overflow-hidden mb-6">
+            <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
+              <h2 class="text-lg font-bold text-white">Upcoming</h2>
+            </div>
+            <div class="divide-y" id="upcoming-tasks">
+              <div class="p-6 text-center text-gray-500" id="upcoming-empty-state">
+                No upcoming tasks scheduled. Click the + button to add.
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Add To Do Button -->
+    <button id="openAddTodo" class="fixed bottom-6 right-6 bg-[#BC6FB7] hover:bg-[#E57DDE] text-white p-4 rounded-full shadow-lg transition-all z-40">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+    </button>
+
+    <!-- Add To-Do Modal -->
+    <div id="addTodoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-lg w-80">
+        <h2 class="text-lg font-bold mb-4 text-[#BC6FB7]">What do you need to do?</h2>
+    
+        <form id="addTodoForm">
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-2">To do:</label>
+            <input type="text" id="newTodoText" name="text" class="w-full border rounded px-3 py-2" placeholder="Enter your task here.." required>
+          </div>
+    
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-2">Select Date:</label>
+            <input id="newTodoDate" name="date" type="date" class="w-full border rounded px-3 py-2" required>
+          </div>
+    
+          <div class="flex justify-end space-x-2">
+            <button type="button" id="cancelAddTodo" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded">Cancel</button>
+            <button type="submit" class="bg-[#BC6FB7] hover:bg-[#E57DDE] text-white px-4 py-2 rounded">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Tasks Modal -->
+    <div id="editTasksModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-lg w-96 max-h-[90vh] overflow-y-auto">
+        <h2 class="text-lg font-semibold mb-4">Edit Task</h2>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Select Task</label>
+          <select id="taskSelect" class="block w-full border border-gray-300 rounded-md p-2">
+            <option value="">Select a task</option>
+          </select>
+        </div>
+        <form id="editTaskForm" class="hidden">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Task</label>
+            <input type="text" name="text" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Date</label>
+            <input type="date" name="date" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+          </div>
+          <div class="flex justify-between mt-6">
+            <button type="button" id="deleteTaskBtn" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+              Delete
+            </button>
+            <div class="flex space-x-2">
+              <button type="button" id="cancelEditTask" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                Cancel
+              </button>
+              <button type="submit" class="px-4 py-2 bg-[#BC6FB7] text-white rounded hover:bg-[#E57DDE]">
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </form>
+        <div id="noTaskSelected" class="text-center text-gray-500 py-4">
+          Please select a task to edit
+        </div>
+        <div class="flex justify-end mt-4" id="editModalCloseBtn">
+          <button type="button" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+            Close
           </button>
-        `;
+        </div>
+      </div>
+    </div>
 
-        ul.appendChild(li);
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-lg w-80">
+        <h2 class="text-lg font-semibold mb-4">Confirm Deletion</h2>
+        <p class="mb-6">Are you sure you want to delete this task? This action cannot be undone.</p>
+        <div class="flex justify-end space-x-2">
+          <button type="button" id="cancelDeleteBtn" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+            No
+          </button>
+          <button type="button" id="confirmDeleteBtn" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+            Yes
+          </button>
+        </div>
+      </div>
+    </div>
 
-        // Close the modal and clear inputs
-        document.getElementById('addTodoModal').classList.add('hidden');
-        document.getElementById('newTodoText').value = '';
-        document.getElementById('datePicker').value = '';
+    <!-- Premium Upgrade Modal -->
+    <div id="premiumUpgradeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
+        <div class="mb-4 text-indigo-300">
+          <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="mx-auto h-16 w-16 mb-4">
+        </div>
+        <h2 class="text-lg font-semibold mb-2">Upgrade to Alaga Premium</h2>
+        <p class="mb-6">You've reached the maximum of 5 tasks. Upgrade to our premium plan to add unlimited to do's.</p>
+        <div class="flex justify-center space-x-2">
+          <button type="button" id="closePremiumModal" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+            Maybe Later
+          </button>
+          <button type="button" id="upgradePremiumBtn" class="px-4 py-2 bg-[#BC6FB7] text-white rounded hover:bg-[#E57DDE]">
+            Upgrade
+          </button>
+        </div>
+      </div>
+    </div>
 
-        
-      });
-
-
-
-
+    <script src="{{ url_for('static', filename='js/todo.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/medications.js') }}"></script>
+    <script>
+      function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('hidden');
+      }
     </script>
   </body>
 </html>
