@@ -135,7 +135,7 @@
             <div class="mb-6">
               <div class="mb-2"> 
                 <h2 class="text-4xl font-bold text-[#596BC7]">Medications</h2>
-                <p class="text-gray-600 text-sm">&nbsp;Ensure Maria Clara takes their meds on time!</p>
+                <p class="text-gray-600 text-sm">Ensure Maria Clara takes their meds on time!</p>
               </div>
             </div>
           
@@ -206,10 +206,10 @@
             <div class="mb-2 flex justify-between items-center"> 
               <div>
                 <h2 class="text-4xl font-bold text-[#596BC7]">Medication History</h2>
-                <p class="text-gray-600 text-sm">&nbsp;Track of all medications taken or skipped</p>
+                <p class="text-gray-600 text-sm">Stay updated on Maria Clara's taken or missed doses.</p>
               </div>
               <button id="backToMainBtn" class="px-4 py-2 bg-[#BC6FB7] text-white rounded hover:bg-[#E57DDE] transition-colors">
-                Back to Dashboard
+                Back to Meds
               </button>
             </div>
           </div>
@@ -239,22 +239,22 @@
     <!-- Add Medication Modal -->
     <div id="addMedicationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
       <div class="bg-white p-6 rounded-lg shadow-lg w-80 max-h-[90vh] overflow-y-auto">
-        <h2 class="text-lg font-semibold mb-4">Add Medication</h2>
+        <h2 class="text-2xl font-semibold mb-4 text-[#BC6FB7]">Add A Medication</h2>
         <form id="addMedicationForm">
           <div class="mb-2">
-            <label class="block text-sm font-medium text-gray-700">Name</label>
+            <label class="block text-sm font-medium text-[#DB6774]">What's the name of the medicine?</label>
             <input type="text" name="name" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
           </div>
           <div class="mb-2">
-            <label class="block text-sm font-medium text-gray-700">Dosage (optional)</label>
+            <label class="block text-sm font-medium text-gray-700">Dosage? (optional)</label>
             <input type="text" name="dosage" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
           </div>
           <div class="mb-2">
-            <label class="block text-sm font-medium text-gray-700">Instructions (optional)</label>
+            <label class="block text-sm font-medium text-gray-700">Any instructions? (optional)</label>
             <input type="text" name="instructions" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
           </div>
           <div class="mb-2">
-            <label class="block text-sm font-medium text-gray-700">Dosage Type</label>
+            <label class="block text-sm font-medium text-[#DB6774]">What is the form of the dosage?</label>
             <select name="dosageType" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
               <option value="tablet">Tablet</option>
               <option value="capsule">Capsule</option>
@@ -265,20 +265,20 @@
             </select>
           </div>
           <div class="mb-2">
-            <label class="block text-sm font-medium text-gray-700">Start Date</label>
+            <label class="block text-sm font-medium text-[#DB6774]">When to start taking the med?</label>
             <input type="date" name="startDate" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
           </div>
           <div class="mb-2">
-            <label class="block text-sm font-medium text-gray-700">End Date</label>
+            <label class="block text-sm font-medium text-[#DB6774]">And when to end?</label>
             <input type="date" name="endDate" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
           </div>
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Time</label>
+            <label class="block text-sm font-medium text-[#DB6774]">At what time of the day?</label>
             <input type="time" name="time" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
           </div>
           <div class="flex justify-end space-x-2">
-            <button type="button" id="cancelAddMedication" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
-            <button type="submit" class="px-4 py-2 bg-[#BC6FB7] text-white rounded hover:bg-[#E57DDE]">Add</button>
+            <button type="button" id="cancelAddMedication" class="text-semibold px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-[#BC6FB7] text-white text-semibold rounded hover:bg-[#E57DDE]">Add</button>
           </div>
         </form>
       </div>
@@ -287,7 +287,7 @@
     <!-- Edit Medications Modal -->
     <div id="editMedicationsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
       <div class="bg-white p-6 rounded-lg shadow-lg w-96 max-h-[90vh] overflow-y-auto">
-        <h2 class="text-lg font-semibold mb-4">Edit Medications</h2>
+        <h2 class="text-lg font-bold mb-4">Edit Medications</h2>
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700 mb-2">Select Medication</label>
           <select id="medicationSelect" class="block w-full border border-gray-300 rounded-md p-2">
@@ -850,9 +850,9 @@
             case 'capsule':
               return `<i class="fa-solid fa-capsules" style="color: #2457a8;"></i>`;
             case 'powder':
-              return `<i class="fa-solid fa-mortar-pestle" style="color: #492a50;"></i>`; // closest icon for powder
+              return `<i class="fa-solid fa-mortar-pestle" style="color: #492a50;"></i>`; 
             case 'solution':
-              return `<i class="fa-solid fa-spoon" style="color: #9090a7;"></i>`; // solution = vial
+              return `<i class="fa-solid fa-spoon fa-flip-horizontal" style="color: #737c8c;"></i>`; 
             case 'injection':
               return `<i class="fa-solid fa-syringe" style="color: #1f858e;"></i>`;
             default: // other
