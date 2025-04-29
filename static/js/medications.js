@@ -481,7 +481,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Render medication history
   function renderMedicationHistory() {
     const historyContainer = document.getElementById("medication-history")
     const historyEmptyState = document.getElementById("history-empty-state")
@@ -493,16 +492,19 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     })
 
-    if (medicationHistory.length > 0) {
+    // Filter out any entries with null status (only show taken or skipped)
+    const validHistory = medicationHistory.filter((item) => item.status === "taken" || item.status === "skipped")
+
+    if (validHistory.length > 0) {
       historyEmptyState.style.display = "none"
 
       // Sort history by date (newest first)
-      medicationHistory.sort((a, b) => new Date(b.date) - new Date(a.date))
+      validHistory.sort((a, b) => new Date(b.date) - new Date(a.date))
 
       // Group history items by date
       const historyByDate = {}
 
-      medicationHistory.forEach((item) => {
+      validHistory.forEach((item) => {
         if (!historyByDate[item.date]) {
           historyByDate[item.date] = []
         }
@@ -850,6 +852,7 @@ document.addEventListener("DOMContentLoaded", () => {
           : JSON.stringify({
               medicationId: id,
               status: status,
+              date: new Date().toISOString().split("T")[0], // Ensure we're using today's date
             }),
     })
       .then((response) => {
@@ -861,6 +864,11 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((data) => {
         // We don't need to reload or re-render here since we've already updated the UI
         // and local data before the server request
+
+        // If we're viewing the history page, update it to reflect changes
+        if (!historyPage.classList.contains("hidden")) {
+          loadMedicationHistory()
+        }
       })
       .catch((error) => {
         console.error("Error updating medication status:", error)
