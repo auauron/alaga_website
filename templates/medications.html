@@ -10,19 +10,8 @@
       <script src="https://cdn.tailwindcss.com"></script>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
       <link rel="shortcut icon" href="../static/images/favicon.ico" type="image/x-icon"/>
+      {% include 'includes/sidebar_styles.html' %}
       <style>
-        .sidebar {
-          transition: transform 0.3s ease-in-out;
-        }
-        
-        @media (max-width: 768px) {
-          .sidebar {
-            transform: translateX(-100%);
-          }
-          .sidebar.open {
-            transform: translateX(0);
-          }
-        }
         
         .medication-card {
           animation: fadeIn 0.3s ease-in-out;
