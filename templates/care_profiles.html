@@ -10,95 +10,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon"/>
-    <style>
-      .sidebar {
-        transition: transform 0.3s ease-in-out;
-      }
-      
-      @media (max-width: 768px) {
-        .sidebar {
-          transform: translateX(-100%);
-        }
-        .sidebar.open {
-          transform: translateX(0);
-        }
-      }
-        .content-container {
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        }
+    {% include 'includes/careprofile_styles.html' %}
 
-        .section-header {
-        margin-bottom: 24px;
-        }
-
-        .form-label {
-        display: block;
-        font-size: 14px;
-        font-weight: 500;
-        margin-bottom: 8px;
-        color: #333;
-        }
-
-        .form-input {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 16px;
-        margin-bottom: 16px;
-        }
-
-        .btn {
-        display: block;
-        width: 100%;
-        padding: 12px;
-        border-radius: 8px;
-        font-weight: 500;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.2s;
-        }
-
-        .btn-primary {
-        background-color: #BC6FB7;
-        color: white;
-        }
-
-        .btn-primary:hover {
-        background-color: #a55ea0;
-        }
-
-        .btn-secondary {
-        background-color: #BC6FB7;
-        color: white;
-        }
-
-        .btn-secondary:hover {
-        background-color: #a55ea0;
-        }
-
-      .modal {
-        display: none;
-        position: fixed;
-        z-index: 100;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-      }
-
-      .modal-content {
-        background-color: white;
-        margin: 15% auto;
-        padding: 20px;
-        border-radius: 10px;
-        max-width: 400px;
-      }
-    </style>
 </head>
 <body class="min-h-screen bg-gray-50 font-[Inter]">
     <div class="flex h-screen relative">
@@ -106,74 +19,7 @@
       <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden" onclick="toggleSidebar()"></div>
       
       <!-- Sidebar -->
-      <aside id="sidebar" class="sidebar fixed md:static w-64 bg-[#BC6FB7] text-white p-6 flex flex-col h-full z-30">
-        <div class="flex flex-col items-start mb-8">       
-          <h1 class="text-3xl font-bold font-montserrat">Hi, {{ fullname.split()[0] }}! </h1>
-          <p class="text-white-600 text-sm mt-2">You're doing a great job. <br> We're proud of you.</p>
-        </div>
-      
-        <!-- Care Profiles Section -->
-        <div class="mb-8">
-          <div class="flex items-center justify-between mb-3">
-            <h2 class="text-white/60 text-sm font-medium">Care Profiles</h2>
-            <span class="text-xs text-white/60 bg-white/10 px-2 py-0.5 rounded-full">{{ profiles|length }}/3</span>
-          </div>
-          <div class="space-y-2">
-            {% for profile in profiles %}
-              <form action="{{ url_for('switch_profile', profile_id=profile.id) }}" method="post">
-                <button type="submit" class="w-full flex items-center space-x-3 {% if session.get('active_profile_id')|int == profile.id %}bg-white/10{% endif %} rounded-lg p-2 hover:bg-white/20 transition">
-                  <div class="w-8 h-8 rounded-full 
-                    {% if loop.index % 3 == 0 %}bg-green-400{% elif loop.index % 3 == 1 %}bg-pink-400{% else %}bg-blue-400{% endif %} 
-                    flex items-center justify-center font-medium text-sm">
-                    {{ profile.care_recipient[:1] }}{{ profile.relationship[:1] }}
-                  </div>
-                  <span>{{ profile.care_recipient }}</span>
-                </button>
-              </form>
-            {% endfor %}
-          </div>
-          {% if profiles|length < 3 %}
-            <a href="{{ url_for('care_profiles') }}" class="w-full block text-sm text-white/60 hover:text-white mt-2 text-left pl-2"> + Add Profiles </a>
-          {% else %}
-            <a href="{{ url_for('care_profiles')}}" class="w-full block text-sm text-white/60 hover:text-white mt-2 text-left pl-2"> View Care Profiles </a>
-          {% endif %}
-        </div>
-
-        <!-- Main Menu (in sidebar) -->
-        <nav class="flex-1">
-          <h2 class="text-white/80 text-sm font-medium mb-3">Main Menu</h2>
-          <div class="space-y-1">
-            <!--Home-->
-            <a href="{{ url_for('dashboard') }}" class="flex items-center space-x-3  rounded-lg p-3 hover:bg-white/20 dark:hover:bg-white/30 transition">
-              <i class="fa-solid fa-house"></i><span>Home</span>
-            </a>
-            <!--To do-->
-            <a href="{{ url_for('todo') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
-              <i class="fa-solid fa-list-check"></i>
-              <span>To do</span>
-            </a>
-            <!--Medications-->
-            <a href="{{ url_for('medications') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
-              <i class="fa-solid fa-pills"></i>
-              <span>Medications</span>
-            </a>
-            <!--Health Records-->
-            <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 dark:hover:bg-white/20 transition">
-              <i class="fa-solid fa-notes-medical"></i><span>Health Records</span>
-            </a>
-          </div>
-        </nav>
-
-        <!-- User Profile -->
-        <div class="mt-auto pt-4 border-t border-white/10">
-          <a href="{{ url_for('view_profile') }}" class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 transition">
-            <div class="w-8 h-8 rounded-full bg-indigo-400 flex items-center justify-center font-medium text-sm">{{ initials }}</div>
-            <div class="text-left">
-              <div class="text-sm font-medium">{{ fullname }}</div>
-              <div class="text-xs text-white/60">View Profile</div>
-            </div>
-          </a>
-        </div>
+      {% include 'includes/sidebar.html' %}
       </aside>    
 
       <!-- Main Content -->
@@ -197,7 +43,7 @@
         <div class="max-w-4xl mx-auto">
           <div class="bg-white p-6 rounded-lg shadow-md">
             <div class="mb-6">
-              <h2 class="text-3xl font-medium text-[#BC6FB7]">Care Profiles</h2>
+              <h2 class="text-4xl font-bold text-[#BC6FB7]">Care Profiles</h2>
               <p class="text-sm text-gray-600 mt-1">Caring starts with understanding. Tell us about your loved ones so we can support you best.</p>
             </div>
               <!-- Profile count indicator -->
@@ -254,11 +100,32 @@
                   <button type="submit" class="w-full py-2 px-4 bg-[#BC6FB7] text-white rounded-md hover:bg-[#a55ea0] transition">Add Care Profile</button>
                 </form>
               {% else %}
+              <!-- Premium Upgrade Modal -->
+                <div id="premiumUpgradeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+                  <div class="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
+                    <div class="mb-4 text-indigo-300">
+                      <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="mx-auto h-16 w-16 mb-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                      </svg>
+                    </div>
+                    <h2 class="text-lg font-semibold mb-2">Upgrade to Alaga Premium</h2>
+                    <p class="mb-6">You've reached the maximum of 3 care profiles. Upgrade to our premium plan to add unlimited profiles.</p>
+                    <div class="flex justify-center space-x-2">
+                      <button type="button" id="closePremiumModal" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                        Maybe Later
+                      </button>
+                      <button type="button" id="upgradePremiumBtn" class="px-4 py-2 bg-[#BC6FB7] text-white rounded hover:bg-[#E57DDE]">
+                        Upgrade
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Subscription upgrade prompt -->
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
                   <h3 class="font-medium text-lg mb-2">Upgrade to Premium</h3>
                   <p class="text-gray-600 mb-4">You've reached the maximum of 3 care profiles. Upgrade to our premium plan to add unlimited profiles.</p>
-                  <a href="#" class="block w-full py-2 px-4 bg-[#BC6FB7] text-white rounded-md hover:bg-[#a55ea0] transition">Upgrade Now</a>
+                  <a href="#" onclick="openPremiumModal(); return false;" class="block w-full py-2 px-4 bg-[#BC6FB7] text-white rounded-md hover:bg-[#a55ea0] transition">Upgrade Now</a>
                 </div>
               {% endif %}
               
@@ -313,6 +180,36 @@
           closeDeleteModal();
         }
       }
+
+      function openPremiumModal() {
+        const modal = document.getElementById('premiumUpgradeModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+      
+      function closePremiumModal() {
+        const modal = document.getElementById('premiumUpgradeModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+      
+      // Add these event listeners to your existing window.onclick function
+      document.addEventListener('DOMContentLoaded', function() {
+        // Close premium modal button
+        document.getElementById('closePremiumModal').addEventListener('click', closePremiumModal);
+      
+      // Upgrade premium button
+        document.getElementById('upgradePremiumBtn').addEventListener('click', function() {
+          closePremiumModal();
+      });
+      
+      // Close modal when clicking outside
+      document.getElementById('premiumUpgradeModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closePremiumModal();
+        }
+      });
+    });
     </script>
 </body>
 </html>

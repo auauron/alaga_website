@@ -10,114 +10,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="shortcut icon" href="../static/images/favicon.ico" type="image/x-icon"/>
-    <style>
-      .sidebar {
-        transition: transform 0.3s ease-in-out;
-      }
-      
-      @media (max-width: 768px) {
-        .sidebar {
-          transform: translateX(-100%);
-        }
-        .sidebar.open {
-          transform: translateX(0);
-        }
-      }
-    </style>
-  </head>
+    {% include 'includes/sidebar_styles.html' %}
+</head>
 <body class="min-h-screen bg-gray-50 font-[Inter]">
   <div class="flex h-screen relative">
       <!-- Overlay -->
       <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden" onclick="toggleSidebar()"></div>
       
-      <!-- Sidebar -->
-      <aside id="sidebar" class="sidebar fixed md:static w-64 bg-[#BC6FB7] text-white p-6 flex flex-col h-full z-30">
-        <div class="flex flex-col items-start mb-8">       
-          <h1 class="text-3xl font-bold font-montserrat">Hi, {{ fullname.split()[0] }}! </h1>
-          <p class="text-white-600 text-sm mt-2">You're doing a great job. <br> We're proud of you.</p>
-        </div>
-
-            
-            <!-- Care Profiles Section -->
-            <div class="mb-8">
-              <div class="flex items-center justify-between mb-3">
-                <h2 class="text-white/60 text-sm font-medium">Care Profiles</h2>
-                <span class="text-xs text-white/60 bg-white/10 px-2 py-0.5 rounded-full">{{ profiles|length }}/3</span>
-              </div>
-              <div class="space-y-2">
-                {% for profile in profiles %}
-                  <form action="{{ url_for('switch_profile', profile_id=profile.id) }}" method="post">
-                    <button type="submit" class="w-full flex items-center space-x-3 {% if session.get('active_profile_id')|int == profile.id %}bg-white/10{% endif %} rounded-lg p-2 hover:bg-white/20 transition">
-                      <div class="w-8 h-8 rounded-full 
-                        {% if loop.index % 3 == 0 %}bg-green-400{% elif loop.index % 3 == 1 %}bg-pink-400{% else %}bg-blue-400{% endif %} 
-                        flex items-center justify-center font-medium text-sm">
-                        {{ profile.care_recipient[:1] }}{{ profile.relationship[:1] }}
-                      </div>
-                      <span>{{ profile.care_recipient }}</span>
-                    </button>
-                  </form>
-                {% endfor %}
-              </div>
-              {% if profiles|length < 3 %}
-                <a href="{{ url_for('care_profiles') }}" class="w-full block text-sm text-white/60 hover:text-white mt-2 text-left pl-2"> + Add Profiles </a>
-              {% else %}
-                <a href="{{ url_for('care_profiles')}}" class="w-full block text-sm text-white/60 hover:text-white mt-2 text-left pl-2"> View Care Profiles </a>
-              {% endif %}
-            </div>
-
-        <!-- Main Menu (in sidebar) -->
-        <nav class="flex-1">
-          <h2 class="text-white/80 text-sm font-medium mb-3">Main Menu</h2>
-          <div class="space-y-1">
-            <!--Home-->
-            <a href="{{ url_for('dashboard') }}" class="flex items-center space-x-3 bg-white/10 rounded-lg p-3 hover:bg-white/20 dark:hover:bg-white/30 transition">
-              <i class="fa-solid fa-house"></i><span>Home</span>
-            </a>
-            <!--To do-->
-            <a href="{{ url_for('todo') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
-              <i class="fa-solid fa-list-check"></i>
-              <span>To do</span>
-            </a>
-            <!--Medications-->
-            <a href="{{ url_for('medications') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 transition">
-              <i class="fa-solid fa-pills"></i>
-              <span>Medications</span>
-            </a>
-            <!--Health Records-->
-            <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 rounded-lg p-3 hover:bg-white/10 dark:hover:bg-white/20 transition">
-              <i class="fa-solid fa-notes-medical"></i><span>Health Records</span>
-            </a>
-          </div>
-        </nav>
-
-        <!-- User Profile -->
-        <div class="mt-auto pt-4 border-t border-white/10">
-          <a href="{{ url_for('view_profile') }}" class="w-full flex items-center space-x-3 rounded-lg p-2 hover:bg-white/10 transition">
-            <div class="w-8 h-8 rounded-full bg-indigo-400 flex items-center justify-center font-medium text-sm">{{ initials }}</div>
-            <div class="text-left">
-              <div class="text-sm font-medium">{{ fullname }}</div>
-              <div class="text-xs text-white/60">View Profile</div>
-            </div>
-          </a>
-        </div>
-      </aside>    
+      <!-- Include the sidebar -->
+      {% include 'includes/sidebar.html' %}
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="bg-white py-3 px-6 shadow-sm flex items-center justify-between">
-          <div class="flex items-center">
-            <button onclick="toggleSidebar()" class="mr-4 md:hidden">
-              <i class="fa-solid fa-bars fa-lg" style="color: #8491d3;"></i>
-            </button>
-            <img src="../static/images/alaga_logo_trans.png" alt="Alaga Logo" class="h-8 w-8 mr-2">
-            <h2 class="text-3xl font-bold text-[#BC6FB7]">Alaga</h2>
-          </div>
-          <div class="flex items-center space-x-4">
-            <button class="text-gray-500 hover:text-gray-700">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-            </button>
-          </div>
-        </header>
+        {% include 'includes/header.html' %}
 
         <main class="flex-1 overflow-auto p-6">
           <!-- Care Summary -->
@@ -281,23 +186,7 @@
       </div>
     </div>
 
-    <script>
-      function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('hidden');
-      }
+    {% include 'includes/sidebar_js.html' %}
 
-      // Function to format the date as "Month Day, Year"
-      function formatDate(date) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return date.toLocaleDateString('en-US', options);
-      }
-
-      // Get today's date and update the span
-      const today = new Date();
-      document.getElementById('todaysDate').textContent = `Today's date: ${formatDate(today)}`;
-    </script>
   </body>
 </html>
