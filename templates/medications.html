@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="shortcut icon" href="../static/images/favicon.ico" type="image/x-icon"/>
     <style>
       .sidebar {
@@ -164,8 +164,8 @@
 
             <!--CARDS-->
             <div class="card bg-white rounded-lg shadow-md overflow-hidden mb-6">
-              <div class="bg-indigo-300 px-4 py-3">
-                <h3 class="text-xl font-medium text-white">Today</h3>
+              <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white">Today</h3>
               </div>
         
               <div class="divide-y" id="today-medications">
@@ -176,8 +176,8 @@
             </div>
         
             <div class="card bg-white rounded-lg shadow-md overflow-hidden mb-6">
-              <div class="bg-indigo-300 px-4 py-3">
-                <h3 class="text-xl font-medium text-white">Tomorrow</h3>
+              <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white">Tomorrow</h3>
               </div>
         
               <div class="divide-y" id="tomorrow-medications">
@@ -188,8 +188,8 @@
             </div>
         
             <div class="card bg-white rounded-lg shadow-md overflow-hidden mb-6">
-              <div class="bg-indigo-300 px-4 py-3">
-                <h3 class="text-xl font-medium text-white">Upcoming</h3>
+              <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white">Upcoming</h3>
               </div>
           
               <div class="divide-y" id="upcoming-medications">
@@ -208,14 +208,14 @@
                 <h2 class="text-4xl font-bold text-[#596BC7]">Medication History</h2>
                 <p class="text-gray-600 text-sm">&nbsp;Track of all medications taken or skipped</p>
               </div>
-              <button id="backToMainBtn" class="px-4 py-2 bg-indigo-300 text-white rounded hover:bg-indigo-400 transition-colors">
+              <button id="backToMainBtn" class="px-4 py-2 bg-[#BC6FB7] text-white rounded hover:bg-[#E57DDE] transition-colors">
                 Back to Dashboard
               </button>
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-            <div class="bg-indigo-300 px-4 py-3">
+          <div class="card bg-white rounded-lg shadow-md overflow-hidden mb-6">
+            <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-cente">
               <h3 class="text-xl font-medium text-white">History</h3>
             </div>
 
@@ -846,29 +846,17 @@
         function getMedicationIcon(dosageType) {
           switch(dosageType) {
             case 'tablet':
-              return `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m-6-8h6M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" />
-              </svg>`;
+              return `<i class="fa-solid fa-tablets" style="color: #fc9682;"></i>`;
             case 'capsule':
-              return `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-              </svg>`;
+              return `<i class="fa-solid fa-capsules" style="color: #2457a8;"></i>`;
             case 'powder':
-              return `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>`;
+              return `<i class="fa-solid fa-mortar-pestle" style="color: #492a50;"></i>`; // closest icon for powder
             case 'solution':
-              return `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>`;
+              return `<i class="fa-solid fa-spoon" style="color: #9090a7;"></i>`; // solution = vial
             case 'injection':
-              return `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
-              </svg>`;
+              return `<i class="fa-solid fa-syringe" style="color: #1f858e;"></i>`;
             default: // other
-              return `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>`;
+              return `<i class="fa-solid fa-prescription-bottle text-black text-2xl"></i>`;
           }
         }
         
