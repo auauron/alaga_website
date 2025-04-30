@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch((error) => {
           console.error("Error deleting medication:", error)
           alert("Failed to delete medication. Please try again.")
-        })  
+        })
     }
   })
 
@@ -438,6 +438,9 @@ document.addEventListener("DOMContentLoaded", () => {
       let hasTomorrow = false
       let hasUpcoming = false
 
+      // Group medications by name for upcoming section
+      const upcomingMedicationsByName = {}
+
       // Add medications
       medications.forEach((med) => {
         const startDate = new Date(med.startDate)
@@ -470,13 +473,30 @@ document.addEventListener("DOMContentLoaded", () => {
         if (upcomingDates.length > 0) {
           hasUpcoming = true
 
-          // Show the next 5 upcoming dates
-          upcomingDates.slice(0, 5).forEach((date) => {
-            const upcomingMed = createMedicationElement(med, "upcoming", date)
-            upcomingContainer.appendChild(upcomingMed)
-          })
+          // Store medication with its upcoming dates
+          if (!upcomingMedicationsByName[med.id]) {
+            upcomingMedicationsByName[med.id] = {
+              medication: med,
+              dates: upcomingDates,
+            }
+          }
+
           upcomingEmptyState.style.display = "none"
         }
+      })
+
+      // Create one card per medication for upcoming section
+      Object.values(upcomingMedicationsByName).forEach(({ medication, dates }) => {
+        // Sort dates chronologically
+        dates.sort((a, b) => a - b)
+
+        // Get first and last date in the range
+        const firstDate = dates[0]
+        const lastDate = dates[dates.length - 1]
+
+        // Create a single card with date range
+        const upcomingMed = createMedicationElement(medication, "upcoming", firstDate, lastDate)
+        upcomingContainer.appendChild(upcomingMed)
       })
     }
   }
@@ -600,7 +620,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Create medication element
-  function createMedicationElement(medication, section, date) {
+  function createMedicationElement(medication, section, date, endDate = null) {
     const div = document.createElement("div")
     div.className = "p-4 flex items-center justify-between medication-card"
     div.dataset.id = medication.id
@@ -650,12 +670,12 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="flex items-center">
             <span class="mr-4">${time}</span>
             ${statusLabel}
-            <button class="${skipBtnClass}" title="Mark as skipped">
+            <button class="${skipBtnClass}" title="Mark as skipped" data-medication-id="${medication.id}">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <button class="${takenBtnClass}" title="Mark as taken">
+            <button class="${takenBtnClass}" title="Mark as taken" data-medication-id="${medication.id}">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
@@ -669,151 +689,36 @@ document.addEventListener("DOMContentLoaded", () => {
         const takenBtn = div.querySelector(".taken-btn")
         const statusLabelSpan = div.querySelector("span.mr-2")
 
-        skippedBtn.addEventListener("click", () => {
-          // Update local data immediately
-          const today = new Date().toISOString().split("T")[0]
-
-          // Find existing history entry
-          const existingEntryIndex = medicationHistory.findIndex(
-            (item) => item.medicationId == medication.id && item.date === today,
+        if (skippedBtn && takenBtn) {
+          skippedBtn.addEventListener("click", () =>
+            handleMedicationStatus(medication, skippedBtn, takenBtn, statusLabelSpan, "skipped"),
           )
-
-          if (skippedBtn.classList.contains("bg-red-500")) {
-            // Already skipped, reset to null
-            skippedBtn.classList.remove("bg-red-500", "text-white")
-            skippedBtn.classList.add("bg-gray-100", "text-gray-400")
-
-            // Update status label
-            statusLabelSpan.textContent = "Status"
-            statusLabelSpan.classList.remove("text-red-500")
-            statusLabelSpan.classList.add("text-gray-400")
-
-            // Reset taken button if it was active
-            takenBtn.classList.remove("bg-green-500", "text-white")
-            takenBtn.classList.add("bg-gray-100", "text-gray-400")
-
-            // Update local data
-            if (existingEntryIndex !== -1) {
-              medicationHistory.splice(existingEntryIndex, 1)
-            }
-
-            // Send to server
-            updateMedicationStatus(medication.id, null)
-          } else {
-            // Mark as skipped
-            skippedBtn.classList.remove("bg-gray-100", "text-gray-400")
-            skippedBtn.classList.add("bg-red-500", "text-white")
-
-            // Update status label
-            statusLabelSpan.textContent = "Skipped"
-            statusLabelSpan.classList.remove("text-gray-400", "text-green-500")
-            statusLabelSpan.classList.add("text-red-500")
-
-            // Reset taken button if it was active
-            takenBtn.classList.remove("bg-green-500", "text-white")
-            takenBtn.classList.add("bg-gray-100", "text-gray-400")
-
-            // Update local data
-            if (existingEntryIndex !== -1) {
-              medicationHistory[existingEntryIndex].status = "skipped"
-            } else {
-              medicationHistory.push({
-                id: Date.now().toString(), // Temporary ID
-                medicationId: medication.id,
-                name: medication.name,
-                dosage: medication.dosage,
-                date: today,
-                time: medication.time,
-                status: "skipped",
-              })
-            }
-
-            // Send to server
-            updateMedicationStatus(medication.id, "skipped")
-          }
-        })
-
-        takenBtn.addEventListener("click", () => {
-          // Update local data immediately
-          const today = new Date().toISOString().split("T")[0]
-
-          // Find existing history entry
-          const existingEntryIndex = medicationHistory.findIndex(
-            (item) => item.medicationId == medication.id && item.date === today,
+          takenBtn.addEventListener("click", () =>
+            handleMedicationStatus(medication, takenBtn, skippedBtn, statusLabelSpan, "taken"),
           )
-
-          if (takenBtn.classList.contains("bg-green-500")) {
-            // Already taken, reset to null
-            takenBtn.classList.remove("bg-green-500", "text-white")
-            takenBtn.classList.add("bg-gray-100", "text-gray-400")
-
-            // Update status label
-            statusLabelSpan.textContent = "Status"
-            statusLabelSpan.classList.remove("text-green-500")
-            statusLabelSpan.classList.add("text-gray-400")
-
-            // Reset skipped button if it was active
-            skippedBtn.classList.remove("bg-red-500", "text-white")
-            skippedBtn.classList.add("bg-gray-100", "text-gray-400")
-
-            // Update local data
-            if (existingEntryIndex !== -1) {
-              medicationHistory.splice(existingEntryIndex, 1)
-            }
-
-            // Send to server
-            updateMedicationStatus(medication.id, null)
-          } else {
-            // Mark as taken
-            takenBtn.classList.remove("bg-gray-100", "text-gray-400")
-            takenBtn.classList.add("bg-green-500", "text-white")
-
-            // Update status label
-            statusLabelSpan.textContent = "Taken"
-            statusLabelSpan.classList.remove("text-gray-400", "text-red-500")
-            statusLabelSpan.classList.add("text-green-500")
-
-            // Reset skipped button if it was active
-            skippedBtn.classList.remove("bg-red-500", "text-white")
-            skippedBtn.classList.add("bg-gray-100", "text-gray-400")
-
-            // Update local data
-            if (existingEntryIndex !== -1) {
-              medicationHistory[existingEntryIndex].status = "taken"
-            } else {
-              medicationHistory.push({
-                id: Date.now().toString(), // Temporary ID
-                medicationId: medication.id,
-                name: medication.name,
-                dosage: medication.dosage,
-                date: today,
-                time: medication.time,
-                status: "taken",
-              })
-            }
-
-            // Send to server
-            updateMedicationStatus(medication.id, "taken")
-          }
-        })
+        }
       }, 0)
     } else if (section === "upcoming" && date) {
-      // For upcoming medications, show date next to time
-      const formattedDate = formatDate(date)
+      // For upcoming medications, show date range if endDate is provided
+      let dateDisplay = formatDate(date)
+
+      if (endDate && !isSameDay(date, endDate)) {
+        dateDisplay = `${formatDate(date)} - ${formatDate(endDate)}`
+      }
 
       div.innerHTML = `
-          <div class="flex items-center">
-            ${icon}
-            <div class="ml-4">
-              <h4 class="font-medium">${medication.name}</h4>
-              <p class="text-sm text-gray-500">${medication.dosage}</p>
-              ${medication.instructions ? `<p class="text-sm text-gray-500">Instructions: ${medication.instructions}</p>` : ""}
-            </div>
-          </div>
-          <div class="flex items-center">
-            <span class="mr-4">${time} <span class="text-gray-500 text-sm">${formattedDate}</span></span>
-          </div>
-        `
+      <div class="flex items-center">
+        ${icon}
+        <div class="ml-4">
+          <h4 class="font-medium">${medication.name}</h4>
+          <p class="text-sm text-gray-500">${medication.dosage}</p>
+          ${medication.instructions ? `<p class="text-sm text-gray-500">Instructions: ${medication.instructions}</p>` : ""}
+        </div>
+      </div>
+      <div class="flex items-center">
+        <span class="mr-4">${time} <span class="text-gray-500 text-sm">${dateDisplay}</span></span>
+      </div>
+    `
     } else {
       // For tomorrow medications
       div.innerHTML = `
@@ -834,38 +739,150 @@ document.addEventListener("DOMContentLoaded", () => {
     return div
   }
 
+  // Handle medication status changes (taken or skipped)
+  function handleMedicationStatus(medication, activeBtn, otherBtn, statusLabel, status) {
+    const today = new Date().toISOString().split("T")[0]
+
+    // Find existing history entry
+    const existingEntryIndex = medicationHistory.findIndex(
+      (item) => item.medicationId == medication.id && item.date === today,
+    )
+
+    // Check if the button is already active (toggling off)
+    if (
+      (status === "taken" && activeBtn.classList.contains("bg-green-500")) ||
+      (status === "skipped" && activeBtn.classList.contains("bg-red-500"))
+    ) {
+      // Reset active button
+      if (status === "taken") {
+        activeBtn.classList.remove("bg-green-500", "text-white")
+        activeBtn.classList.add("bg-gray-100", "text-gray-400")
+      } else {
+        activeBtn.classList.remove("bg-red-500", "text-white")
+        activeBtn.classList.add("bg-gray-100", "text-gray-400")
+      }
+
+      // Update status label
+      statusLabel.textContent = "Status"
+      statusLabel.classList.remove("text-green-500", "text-red-500")
+      statusLabel.classList.add("text-gray-400")
+
+      // Update local data - remove the entry
+      if (existingEntryIndex !== -1) {
+        medicationHistory.splice(existingEntryIndex, 1)
+      }
+
+      // Send delete request to server
+      deleteMedicationHistory(medication.id, today)
+    } else {
+      // Activate this button
+      if (status === "taken") {
+        activeBtn.classList.remove("bg-gray-100", "text-gray-400")
+        activeBtn.classList.add("bg-green-500", "text-white")
+
+        // Update status label
+        statusLabel.textContent = "Taken"
+        statusLabel.classList.remove("text-gray-400", "text-red-500")
+        statusLabel.classList.add("text-green-500")
+
+        // Reset other button
+        otherBtn.classList.remove("bg-red-500", "text-white")
+        otherBtn.classList.add("bg-gray-100", "text-gray-400")
+      } else {
+        activeBtn.classList.remove("bg-gray-100", "text-gray-400")
+        activeBtn.classList.add("bg-red-500", "text-white")
+
+        // Update status label
+        statusLabel.textContent = "Skipped"
+        statusLabel.classList.remove("text-gray-400", "text-green-500")
+        statusLabel.classList.add("text-red-500")
+
+        // Reset other button
+        otherBtn.classList.remove("bg-green-500", "text-white")
+        otherBtn.classList.add("bg-gray-100", "text-gray-400")
+      }
+
+      // Update local data
+      if (existingEntryIndex !== -1) {
+        medicationHistory[existingEntryIndex].status = status
+      } else {
+        medicationHistory.push({
+          id: Date.now().toString(), // Temporary ID
+          medicationId: medication.id,
+          name: medication.name,
+          dosage: medication.dosage,
+          date: today,
+          time: medication.time,
+          status: status,
+        })
+      }
+
+      // Send to server
+      updateMedicationStatus(medication.id, status)
+    }
+  }
+
+  // Delete medication history entry
+  function deleteMedicationHistory(medicationId, date) {
+    // First find the history entry ID if it exists
+    fetch("/api/medication-history")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.history) {
+          const historyEntry = data.history.find((item) => item.medicationId == medicationId && item.date === date)
+
+          if (historyEntry) {
+            // If we found the entry, delete it
+            fetch(`/api/medication-history/${historyEntry.id}`, {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error("Failed to delete medication history")
+                }
+                return response.json()
+              })
+              .then(() => {
+                // If we're viewing the history page, update it
+                if (!historyPage.classList.contains("hidden")) {
+                  loadMedicationHistory()
+                }
+              })
+              .catch((error) => {
+                console.error("Error deleting medication history:", error)
+              })
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("Error finding medication history to delete:", error)
+      })
+  }
+
   // Update medication status and add to history
   function updateMedicationStatus(id, status) {
-    // If status is null, delete the history entry instead of updating it
-    const method = status === null ? "DELETE" : "POST"
-    const endpoint = status === null ? `/api/medication-history/${id}` : "/api/medication-history"
-
     // Send to server
-    fetch(endpoint, {
-      method: method,
+    fetch("/api/medication-history", {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body:
-        status === null
-          ? null
-          : JSON.stringify({
-              medicationId: id,
-              status: status,
-              date: new Date().toISOString().split("T")[0], // Ensure we're using today's date
-            }),
+      body: JSON.stringify({
+        medicationId: id,
+        status: status,
+        date: new Date().toISOString().split("T")[0], // Ensure we're using today's date
+      }),
     })
       .then((response) => {
         if (!response.ok) {
-
           throw new Error("Failed to update medication status")
         }
         return response.json()
       })
       .then((data) => {
-        // We don't need to reload or re-render here since we've already updated the UI
-        // and local data before the server request
-
         // If we're viewing the history page, update it to reflect changes
         if (!historyPage.classList.contains("hidden")) {
           loadMedicationHistory()
@@ -901,7 +918,15 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
-  // Initialize the app
+  // Initialize the app - load data when page loads and when active profile changes
   loadMedications()
   loadMedicationHistory()
+
+  // Add event listener for page visibility changes to refresh data when user returns to the page
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      loadMedications()
+      loadMedicationHistory()
+    }
+  })
 })
