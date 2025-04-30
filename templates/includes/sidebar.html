@@ -18,7 +18,8 @@
               <div class="w-8 h-8 rounded-full 
                 {% if loop.index % 3 == 0 %}bg-green-400{% elif loop.index % 3 == 1 %}bg-pink-400{% else %}bg-blue-400{% endif %} 
                 flex items-center justify-center font-medium text-sm">
-                {{ profile.care_recipient[:1] }}{{ profile.relationship[:1] }}
+                {% set names = profile.care_recipient.split() %}
+                {{ names[0][0] }}{{ names[1][0] if names|length > 1 else '' }}
               </div>
               <span>{{ profile.care_recipient }}</span>
             </button>

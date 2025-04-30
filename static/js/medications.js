@@ -857,6 +857,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
       .then((response) => {
         if (!response.ok) {
+
           throw new Error("Failed to update medication status")
         }
         return response.json()
@@ -872,8 +873,6 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((error) => {
         console.error("Error updating medication status:", error)
-        alert("Failed to update medication status. Please try again.")
-
         // If there was an error, reload to get the correct state
         loadMedicationHistory()
         renderMedications()
