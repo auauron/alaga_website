@@ -166,15 +166,15 @@
         <form id="addMedicationForm">
           <div class="mb-2">
             <label class="block text-sm font-medium text-gray-700">Name</label>
-            <input type="text" name="name" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+            <input type="text" name="name" required class="mt-1 block w-full border border-gray-300 rounded-md p-2" placeholder="e.g. Metformin, Simvastatin" required>
           </div>
           <div class="mb-2">
             <label class="block text-sm font-medium text-gray-700">Dosage (optional)</label>
-            <input type="text" name="dosage" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+            <input type="text" name="dosage" class="mt-1 block w-full border border-gray-300 rounded-md p-2" placeholder="e.g. 5 mg, 1 tablet" required>
           </div>
           <div class="mb-2">
             <label class="block text-sm font-medium text-gray-700">Instructions (optional)</label>
-            <input type="text" name="instructions" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+            <input type="text" name="instructions" class="mt-1 block w-full border border-gray-300 rounded-md p-2" placeholder="e.g. Take with food, before bed" required>
           </div>
           <div class="mb-2">
             <label class="block text-sm font-medium text-gray-700">Dosage Type</label>
@@ -212,7 +212,7 @@
       <div class="bg-white p-6 rounded-lg shadow-lg w-96 max-h-[90vh] overflow-y-auto">
         <h2 class="text-lg font-semibold mb-4">Edit Medications</h2>
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Select Medication</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">What medication would you like to edit?</label>
           <select id="medicationSelect" class="block w-full border border-gray-300 rounded-md p-2">
             <option value="">Select a medication</option>
           </select>

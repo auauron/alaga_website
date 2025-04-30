@@ -10,7 +10,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.root_path, 'database.db')
-app.config['SECRET_KEY'] = 'mysecretkey'
+app.config['SECRET_KEY'] = 'ubedelechesecretkey'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 

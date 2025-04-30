@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch((error) => {
           console.error("Error deleting medication:", error)
           alert("Failed to delete medication. Please try again.")
-        })
+        })  
     }
   })
 
