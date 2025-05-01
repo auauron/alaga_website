@@ -363,33 +363,79 @@ def dashboard():
     
     if profile_id:
         active_profile = CareProfile.query.get(profile_id)
-        if active_profile and active_profile.user_id == current_user.id:
-            # Using the care recipient's name for the dashboard
-            fullname = current_user.fullname  # Keep user's name in the sidebar
-            initials = get_initials(fullname)
-            return render_template('dashboard.html', 
-                                  fullname=fullname, 
-                                  initials=initials, 
-                                  profiles=profiles, 
-                                  active_profile=active_profile)
-
-    # fallback if no profile selected
+    
+    # Get today's date
+    today = datetime.now().date()
+    tomorrow = today + timedelta(days=1)
+    
+    # Fetch todos for today
+    if active_profile:
+        todos = Todo.query.filter_by(
+            user_id=current_user.id,
+            profile_id=active_profile.id,
+            date=today
+        ).limit(3).all()
+    else:
+        todos = Todo.query.filter_by(
+            user_id=current_user.id,
+            date=today
+        ).limit(3).all()
+    
+    # Fetch medications for today
+    if active_profile:
+        medications = Medication.query.filter_by(
+            user_id=current_user.id,
+            profile_id=active_profile.id
+        ).limit(3).all()
+    else:
+        medications = Medication.query.filter_by(
+            user_id=current_user.id
+        ).limit(3).all()
+    
+    # Filter medications that should be taken today
+    today_medications = []
+    for med in medications:
+        start_date = med.start_date
+        end_date = med.end_date
+        if start_date <= today <= end_date:
+            today_medications.append(med)
+    
+    # Fetch recent health records
+    if active_profile:
+        health_records = HealthRecord.query.filter_by(
+            user_id=current_user.id,
+            profile_id=active_profile.id
+        ).order_by(HealthRecord.timestamp.desc()).limit(3).all()
+    else:
+        health_records = HealthRecord.query.filter_by(
+            user_id=current_user.id
+        ).order_by(HealthRecord.timestamp.desc()).limit(3).all()
+    
+    # Group health records by category
+    vital_signs = [r for r in health_records if r.category == 'vital-signs']
+    biometrics = [r for r in health_records if r.category == 'biometrics']
+    medical_notes = [r for r in health_records if r.category == 'medical-notes']
+    
+    # Combine and limit to most recent 2
+    combined_records = (vital_signs + biometrics)[:2]
+    
     fullname = current_user.fullname
     initials = get_initials(fullname)
+    
     return render_template('dashboard.html', 
                           fullname=fullname, 
                           initials=initials, 
                           profiles=profiles, 
-                          active_profile=None)
+                          active_profile=active_profile,
+                          todos=todos,
+                          medications=today_medications,
+                          health_records=combined_records,
+                          today=today)
 
-
-# APP ROUTES HERE
-
-#route for to do page
 @app.route('/todo', methods=['GET', 'POST'])
 @login_required
 def todo():
-
+    # Your existing todo route code
     profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
     
     profile_id = session.get('active_profile_id')
@@ -721,10 +767,6 @@ def add_todo():
             todo_count = Todo.query.filter_by(user_id=current_user.id).count()
             if todo_count >= 5:
                 return jsonify({'error': 'You have reached the maximum number of todos (5). Please upgrade to premium.'}), 403
-        
-        data = request.get_json()
-        if not data:
-            return jsonify({'error  403'})
         
         data = request.get_json()
         if not data:

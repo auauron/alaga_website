@@ -50,20 +50,16 @@
 
         <!-- main MAIN content -->
         <main class="flex-1 overflow-auto p-6" id="main-content">
-            <!-- Care Summary -->
-            <div class="mb-6">
-              <div class="mb-2"> 
-                <h2 class="text-4xl font-bold text-[#596BC7]">Medications</h2>
-                {% if active_profile %}
-                <p class="text-gray-600 text-sm">Ensure {{ active_profile.care_recipient }} takes their meds on time!</p>
-                {% else %}
-                <p class="text-gray-600 text-sm">Select a care profile to manage medications</p>
-                {% endif %}
-              </div>
+          <div class="mb-6">
+            <div class="mb-2"> 
+              <h2 class="text-4xl font-bold text-[#596BC7]">Health Records</h2>
+              {% if active_profile %}
+                <p class="text-gray-600 text-sm">&nbsp;Keep track of {{ active_profile.care_recipient }}'s well-being</p>
+              {% else %}
+                <p class="text-gray-600 text-sm">&nbsp;Keep track of your loved one's well-being</p>
+              {% endif %}
             </div>
-          
-            <!-- Today's Date -->
-            <div class="bg-gradient-to-r from-pink-400 to-purple-500 rounded-lg shadow-sm p-4 text-white flex items-center justify-between mb-4">
+            <div class="bg-gradient-to-r from-pink-400 to-purple-500 rounded-lg p-4 text-white flex items-center justify-between">
               <div class="flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
                   <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
@@ -74,6 +70,7 @@
                 <span id="current-date">Today's date: </span>
               </div>
             </div>
+          </div>
           
             <!-- Buttons: Edit and See History -->
             <div class="flex justify-end space-x-3 mb-4">
