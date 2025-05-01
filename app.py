@@ -487,9 +487,24 @@ def health_records():
 @app.route('/switch_profile/<int:profile_id>', methods=['POST'])
 @login_required
 def switch_profile(profile_id):
+    # Get the referring URL (the page the user was on when they clicked switch)
+    referrer = request.referrer
+    
     selected_profile = CareProfile.query.filter_by(id=profile_id, user_id=current_user.id).first()
     if selected_profile:
         session['active_profile_id'] = profile_id
+    
+    # Determine where to redirect based on the referring URL
+    if referrer:
+        if 'todo' in referrer:
+            return redirect(url_for('todo'))  
+        elif 'medications' in referrer:
+            return redirect(url_for('medications')) 
+        elif 'view_profile' in referrer:
+            return redirect(url_for('view_profile'))
+        elif 'health_records' in referrer:
+            return redirect(url_for('health_records'))
+    # Default to dashboard if no matching referrer
     return redirect(url_for('dashboard'))
 
 # ----------------------------------------------------API Routes for Medications
