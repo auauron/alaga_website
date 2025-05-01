@@ -601,7 +601,7 @@ document.addEventListener("DOMContentLoaded", () => {
     )
   }
 
-  // Get medication icon based on dosage type
+  // Get medication icon based on dosage type ------------ ICONS
   function getMedicationIcon(dosageType) {
     switch (dosageType) {
       case "tablet":
@@ -609,13 +609,13 @@ document.addEventListener("DOMContentLoaded", () => {
       case "capsule":
         return `<i class="fa-solid fa-capsules" style="color: #2457a8;"></i>`
       case "powder":
-        return `<i class="fa-solid fa-mortar-pestle" style="color: #492a50;"></i>`
+        return `<i class="fa-solid fa-bowl-rice" style="color: #B197FC;"></i>`
       case "solution":
         return `<i class="fa-solid fa-spoon" style="color: #9090a7;"></i>`
       case "injection":
         return `<i class="fa-solid fa-syringe" style="color: #1f858e;"></i>`
       default: // other
-        return `<i class="fa-solid fa-prescription-bottle text-black text-2xl"></i>`
+        return `<i class="fa-solid fa-prescription-bottle-medical" style="color: #63E6BE;"></i>`
     }
   }
 

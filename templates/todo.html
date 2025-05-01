@@ -158,16 +158,16 @@
     <!-- Add To-Do Modal -->
     <div id="addTodoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
       <div class="bg-white p-6 rounded-lg shadow-lg w-80">
-        <h2 class="text-lg font-bold mb-4 text-[#BC6FB7]">What do you need to do?</h2>
+        <h2 class="text-2xl font-bold mb-4 text-[#8491D3]">Add a To do</h2>
     
         <form id="addTodoForm">
           <div class="mb-4">
-            <label class="block text-gray-700 mb-2">To do:</label>
+            <label class="block text-[#DB6774] font-medium mb-2">What do we need to do for {{ active_profile.care_recipient }}?</label>
             <input type="text" id="newTodoText" name="text" class="w-full border rounded px-3 py-2" placeholder="Enter your task here.." required>
           </div>
     
           <div class="mb-4">
-            <label class="block text-gray-700 mb-2">Select Date:</label>
+            <label class="block text-[#DB6774] font-medium mb-2">When should we do this? </label>
             <input id="newTodoDate" name="date" type="date" class="w-full border rounded px-3 py-2" required>
           </div>
     
@@ -182,11 +182,11 @@
     <!-- Edit Tasks Modal -->
     <div id="editTasksModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
       <div class="bg-white p-6 rounded-lg shadow-lg w-96 max-h-[90vh] overflow-y-auto">
-        <h2 class="text-lg font-semibold mb-4">Edit Task</h2>
+        <h2 class="text-2xl font-bold mb-4 text-[#8491D3]">Edit To Do</h2>
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Select Task</label>
+          <label class="block text-sm font-medium text-[#DB6774] mb-2">What To Do Task would you like to edit?</label>
           <select id="taskSelect" class="block w-full border border-gray-300 rounded-md p-2">
-            <option value="">Select a task</option>
+            <option value="">Select a To Do Task</option>
           </select>
         </div>
         <form id="editTaskForm" class="hidden">
