@@ -377,6 +377,9 @@ def dashboard():
                           profiles=profiles, 
                           active_profile=None)
 
+
+# APP ROUTES HERE
+
 #route for to do page
 @app.route('/todo', methods=['GET', 'POST'])
 @login_required
@@ -395,6 +398,7 @@ def todo():
     return render_template('todo.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile)
 
 # Updated medications route to include backend data
+#route for medications page
 @app.route('/medications', methods=['GET'])
 @login_required
 def medications():
@@ -438,7 +442,7 @@ def switch_profile(profile_id):
         session['active_profile_id'] = profile_id
     return redirect(url_for('dashboard'))
 
-# API Routes for Medications
+# ----------------------------------------------------API Routes for Medications
 
 # Get all medications for the current active profile
 @app.route('/api/medications', methods=['GET'])
@@ -564,7 +568,7 @@ def delete_medication(medication_id):
     
     return jsonify({'message': 'Medication deleted successfully'})
 
-# API Routes for Medication History
+# --------------------------------------------------API Routes for Medication History
 
 # Get medication history for the current active profile
 @app.route('/api/medication-history', methods=['GET'])
@@ -654,7 +658,7 @@ def delete_medication_history(history_id):
     
     return jsonify({'message': 'History entry deleted successfully'})
 
-# API Routes for Todos
+# -------------------------------------------------- API Routes for Todos
 
 @app.route('/api/todos', methods=['GET'])
 @login_required
@@ -703,9 +707,16 @@ def get_todos():
 def add_todo():
     try:
         # Check if user has reached the todo limit (5 for free users)
-        todo_count = Todo.query.filter_by(user_id=current_user.id).count()
-        if todo_count >= 5:
-            return jsonify({'error': 'You have reached the maximum number of todos (5). Please upgrade to premium.'}), 403
+        profile_id = session.get('active_profile_id')
+        if profile_id:
+            todo_count = Todo.query.filter_by(user_id=current_user.id, profile_id=profile_id).count()
+            if todo_count >= 5:
+                return jsonify({'error': 'You have reached the maximum number of todos (5). Please upgrade to premium.'}), 403
+        else:
+            # If no profile is selected, count all todos for this user
+            todo_count = Todo.query.filter_by(user_id=current_user.id).count()
+            if todo_count >= 5:
+                return jsonify({'error': 'You have reached the maximum number of todos (5). Please upgrade to premium.'}), 403
         
         data = request.get_json()
         if not data:
@@ -758,6 +769,7 @@ def update_todo(todo_id):
         if not data:
             return jsonify({'error': 'No data provided'}), 400
         
+        
         # Update todo fields
         if 'text' in data:
             todo.text = data['text']
@@ -798,7 +810,7 @@ def delete_todo(todo_id):
         app.logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
-# API Routes for Health Records
+# ----------------------------------------------------- API Routes for Health Records
 
 @app.route('/api/health-records', methods=['GET'])
 @login_required
@@ -816,6 +828,7 @@ def get_health_records():
         all_records = records_query.order_by(HealthRecord.timestamp.desc()).all()
         
         return jsonify([record.to_dict() for record in all_records])
+    
     except Exception as e:
         app.logger.error(f"Error in get_health_records: {str(e)}")
         app.logger.error(traceback.format_exc())
