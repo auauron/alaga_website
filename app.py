@@ -23,6 +23,7 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MODELS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     fullname = db.Column(db.String(20), nullable=False)
@@ -186,14 +187,18 @@ class HealthRecord(db.Model):
             
         return result
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ROUTES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 @app.route('/')
 def home():
     return render_template('home.html')
 
+# route for the start page
 @app.route('/start', methods=['GET', 'POST'])
 def start():
     return render_template('start.html')
 
+# route for the login page
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -213,12 +218,14 @@ def login():
         return render_template('login.html', form=form, error=form.errors)
     return render_template('login.html', form=form)
 
+# route for the logout page
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
+# route for the registration page
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -235,21 +242,13 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
-@app.context_processor
-def utility_processor():
-    return dict(get_initials=get_initials)
-
+# route for the upgrade to premium page
 @app.route('/upgrade_premium')
+@login_required
 def upgrade_premium():
     return render_template('upgrade_premium.html')
 
-
-# route for view profile
-def get_initials(name):
-    parts = name.strip().split()
-    initials = ''.join([p[0].upper() for p in parts if p])
-    return initials
-
+# route for the profile page
 @app.route('/view_profile', methods=['GET', 'POST'])
 @login_required
 def view_profile():
@@ -308,11 +307,11 @@ def care_profiles():
         session['active_profile_id'] = new_profile.id
         return redirect(url_for('dashboard'))
 
-    # For GET requests, show the care profiles page
     fullname = current_user.fullname
     initials = get_initials(fullname)
     return render_template('care_profiles.html', profiles=profiles, fullname=fullname, initials=initials)
 
+# route for the profile edit page
 @app.route('/edit_profile/<int:profile_id>', methods=['GET', 'POST'])
 @login_required
 def edit_profile(profile_id):
@@ -335,6 +334,7 @@ def edit_profile(profile_id):
     initials = get_initials(fullname)
     return render_template('edit_profile.html', profile=profile, profiles=profiles, fullname=fullname, initials=initials)
 
+# route for the delete profile page
 @app.route('/delete_profile/<int:profile_id>', methods=['POST'])
 @login_required
 def delete_profile(profile_id):
@@ -487,14 +487,13 @@ def health_records():
 @app.route('/switch_profile/<int:profile_id>', methods=['POST'])
 @login_required
 def switch_profile(profile_id):
-    # Get the referring URL (the page the user was on when they clicked switch)
+
     referrer = request.referrer
     
     selected_profile = CareProfile.query.filter_by(id=profile_id, user_id=current_user.id).first()
     if selected_profile:
         session['active_profile_id'] = profile_id
     
-    # Determine where to redirect based on the referring URL
     if referrer:
         if 'todo' in referrer:
             return redirect(url_for('todo'))  
@@ -504,7 +503,7 @@ def switch_profile(profile_id):
             return redirect(url_for('view_profile'))
         elif 'health_records' in referrer:
             return redirect(url_for('health_records'))
-    # Default to dashboard if no matching referrer
+        
     return redirect(url_for('dashboard'))
 
 # ----------------------------------------------------API Routes for Medications
@@ -1062,6 +1061,16 @@ def delete_health_record(record_id):
         app.logger.error(f"Error in delete_health_record: {str(e)}")
         app.logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
+
+@app.context_processor
+def utility_processor():
+    return dict(get_initials=get_initials)
+
+
+def get_initials(name):
+    parts = name.strip().split()
+    initials = ''.join([p[0].upper() for p in parts if p])
+    return initials
 
 if __name__ == '__main__':
     with app.app_context():
