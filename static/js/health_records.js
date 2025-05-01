@@ -1467,7 +1467,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         const value = formData.get("value")
         if (!value) {
-          showError("recordValue", "Please add a value")
+          showError("recordValue", "Value Required")
           hasErrors = true
         } else {
           record.value = value
