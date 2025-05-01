@@ -6,7 +6,8 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 import os
 from flask_bcrypt import Bcrypt
-from datetime import datetime
+from datetime import datetime, timedelta
+import traceback
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.root_path, 'database.db')
@@ -30,6 +31,10 @@ class User(db.Model, UserMixin):
 
     # User medications
     medications = db.relationship('Medication', backref='user_profile', lazy=True, cascade="all, delete-orphan")
+    # User todos
+    todos = db.relationship('Todo', backref='user', lazy=True, cascade="all, delete-orphan")
+    # User health records
+    health_records = db.relationship('HealthRecord', backref='user', lazy=True, cascade="all, delete-orphan")
 
 class RegisterForm(FlaskForm):
     fullname = StringField('Fullname', validators=[InputRequired(), Length(
@@ -66,6 +71,10 @@ class CareProfile(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     # Add relationship to medications
     medications = db.relationship('Medication', backref='care_profile', lazy=True, cascade="all, delete-orphan")
+    # Add relationship to todos
+    todos = db.relationship('Todo', backref='care_profile', lazy=True, cascade="all, delete-orphan")
+    # Add relationship to health records
+    health_records = db.relationship('HealthRecord', backref='care_profile', lazy=True, cascade="all, delete-orphan")
 
 # New Medication model
 class Medication(db.Model):
@@ -122,6 +131,60 @@ class MedicationHistory(db.Model):
             'createdAt': self.created_at.isoformat(),
             'updatedAt': self.updated_at.isoformat()
         }
+
+# Todo model
+class Todo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(200), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    completed = db.Column(db.Boolean, default=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    profile_id = db.Column(db.Integer, db.ForeignKey('care_profile.id'), nullable=True)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'text': self.text,
+            'date': self.date.isoformat(),
+            'completed': self.completed
+        }
+
+# Health Record model
+class HealthRecord(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    category = db.Column(db.String(50), nullable=False)  # vital-signs, biometrics, medical-notes
+    type = db.Column(db.String(50), nullable=True)       # specific type within category
+    value = db.Column(db.String(100), nullable=True)     # value for measurements
+    systolic = db.Column(db.Integer, nullable=True)      # for blood pressure
+    diastolic = db.Column(db.Integer, nullable=True)     # for blood pressure
+    subject = db.Column(db.String(200), nullable=True)   # for medical notes
+    body = db.Column(db.Text, nullable=True)             # for medical notes
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.String(10), nullable=False)      # Store as HH:MM
+    timestamp = db.Column(db.BigInteger, nullable=False) # For sorting
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    profile_id = db.Column(db.Integer, db.ForeignKey('care_profile.id'), nullable=True)
+    
+    def to_dict(self):
+        result = {
+            'id': self.id,
+            'category': self.category,
+            'date': self.date.isoformat(),
+            'time': self.time,
+            'timestamp': self.timestamp
+        }
+        
+        if self.category in ['vital-signs', 'biometrics']:
+            result['type'] = self.type
+            result['value'] = self.value
+            if self.type == 'blood-pressure':
+                result['systolic'] = self.systolic
+                result['diastolic'] = self.diastolic
+        elif self.category == 'medical-notes':
+            result['subject'] = self.subject
+            result['body'] = self.body
+            
+        return result
 
 @app.route('/')
 def home():
@@ -590,6 +653,316 @@ def delete_medication_history(history_id):
     db.session.commit()
     
     return jsonify({'message': 'History entry deleted successfully'})
+
+# API Routes for Todos
+
+@app.route('/api/todos', methods=['GET'])
+@login_required
+def get_todos():
+    try:
+        # Get current date
+        today = datetime.now().date()
+        tomorrow = (datetime.now() + timedelta(days=1)).date()
+        
+        # Get todos for the current user
+        todos_query = Todo.query.filter_by(user_id=current_user.id)
+        
+        # Filter by profile if one is active
+        profile_id = session.get('active_profile_id')
+        if profile_id:
+            todos_query = todos_query.filter((Todo.profile_id == profile_id) | (Todo.profile_id == None))
+        
+        # Get all todos
+        all_todos = todos_query.all()
+        
+        # Categorize todos
+        today_todos = []
+        tomorrow_todos = []
+        upcoming_todos = []
+        
+        for todo in all_todos:
+            if todo.date == today:
+                today_todos.append(todo.to_dict())
+            elif todo.date == tomorrow:
+                tomorrow_todos.append(todo.to_dict())
+            elif todo.date > tomorrow:
+                upcoming_todos.append(todo.to_dict())
+        
+        return jsonify({
+            'today': today_todos,
+            'tomorrow': tomorrow_todos,
+            'upcoming': upcoming_todos
+        })
+    except Exception as e:
+        app.logger.error(f"Error in get_todos: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/todos', methods=['POST'])
+@login_required
+def add_todo():
+    try:
+        # Check if user has reached the todo limit (5 for free users)
+        todo_count = Todo.query.filter_by(user_id=current_user.id).count()
+        if todo_count >= 5:
+            return jsonify({'error': 'You have reached the maximum number of todos (5). Please upgrade to premium.'}), 403
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({'error  403'})
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        # Convert string date to datetime object
+        date = datetime.strptime(data['date'], '%Y-%m-%d').date()
+        
+        profile_id = session.get('active_profile_id')
+        
+        new_todo = Todo(
+            text=data['text'],
+            date=date,
+            completed=data.get('completed', False),
+            user_id=current_user.id,
+            profile_id=profile_id
+        )
+        
+        db.session.add(new_todo)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Todo added successfully',
+            'todo': new_todo.to_dict()
+        })
+    except KeyError as e:
+        return jsonify({'error': f'Missing required field: {str(e)}'}), 400
+    except ValueError as e:
+        return jsonify({'error': f'Invalid data format: {str(e)}'}), 400
+    except Exception as e:
+        app.logger.error(f"Error in add_todo: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/todos/<int:todo_id>', methods=['PUT'])
+@login_required
+def update_todo(todo_id):
+    try:
+        # Find the todo and verify it belongs to the current user
+        todo = Todo.query.filter_by(id=todo_id, user_id=current_user.id).first()
+        
+        if not todo:
+            return jsonify({'error': 'Todo not found'}), 404
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        # Update todo fields
+        if 'text' in data:
+            todo.text = data['text']
+        if 'date' in data:
+            todo.date = datetime.strptime(data['date'], '%Y-%m-%d').date()
+        if 'completed' in data:
+            todo.completed = data['completed']
+        
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Todo updated successfully',
+            'todo': todo.to_dict()
+        })
+    except ValueError as e:
+        return jsonify({'error': f'Invalid data format: {str(e)}'}), 400
+    except Exception as e:
+        app.logger.error(f"Error in update_todo: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/todos/<int:todo_id>', methods=['DELETE'])
+@login_required
+def delete_todo(todo_id):
+    try:
+        # Find the todo and verify it belongs to the current user
+        todo = Todo.query.filter_by(id=todo_id, user_id=current_user.id).first()
+        
+        if not todo:
+            return jsonify({'error': 'Todo not found'}), 404
+        
+        db.session.delete(todo)
+        db.session.commit()
+        
+        return jsonify({'message': 'Todo deleted successfully'})
+    except Exception as e:
+        app.logger.error(f"Error in delete_todo: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+# API Routes for Health Records
+
+@app.route('/api/health-records', methods=['GET'])
+@login_required
+def get_health_records():
+    try:
+        # Get health records for the current user
+        records_query = HealthRecord.query.filter_by(user_id=current_user.id)
+        
+        # Filter by profile if one is active
+        profile_id = session.get('active_profile_id')
+        if profile_id:
+            records_query = records_query.filter((HealthRecord.profile_id == profile_id) | (HealthRecord.profile_id == None))
+        
+        # Get all records sorted by timestamp (newest first)
+        all_records = records_query.order_by(HealthRecord.timestamp.desc()).all()
+        
+        return jsonify([record.to_dict() for record in all_records])
+    except Exception as e:
+        app.logger.error(f"Error in get_health_records: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/health-records', methods=['POST'])
+@login_required
+def add_health_record():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        profile_id = session.get('active_profile_id')
+        
+        # Count unique types for vital signs and biometrics
+        unique_vital_signs = db.session.query(HealthRecord.type).filter(
+            HealthRecord.user_id == current_user.id,
+            HealthRecord.category == 'vital-signs'
+        ).distinct().count()
+        
+        unique_biometrics = db.session.query(HealthRecord.type).filter(
+            HealthRecord.user_id == current_user.id,
+            HealthRecord.category == 'biometrics'
+        ).distinct().count()
+        
+        medical_notes_count = HealthRecord.query.filter_by(
+            user_id=current_user.id,
+            category='medical-notes'
+        ).count()
+        
+        # Check if user has reached the health record limit (3 for free users)
+        total_record_types = unique_vital_signs + unique_biometrics + medical_notes_count
+        if total_record_types >= 3:
+            return jsonify({'error': 'You have reached the maximum number of health record types (3). Please upgrade to premium.'}), 403
+        
+        # Convert string date to datetime object
+        date = datetime.strptime(data['date'], '%Y-%m-%d').date()
+        
+        new_record = HealthRecord(
+            category=data['category'],
+            date=date,
+            time=data['time'],
+            timestamp=data['timestamp'],
+            user_id=current_user.id,
+            profile_id=profile_id
+        )
+        
+        # Add category-specific fields
+        if data['category'] in ['vital-signs', 'biometrics']:
+            new_record.type = data['type']
+            new_record.value = data['value']
+            
+            if data['type'] == 'blood-pressure':
+                new_record.systolic = data['systolic']
+                new_record.diastolic = data['diastolic']
+                
+        elif data['category'] == 'medical-notes':
+            new_record.subject = data['subject']
+            new_record.body = data.get('body', '')
+        
+        db.session.add(new_record)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Health record added successfully',
+            'id': new_record.id
+        })
+    except KeyError as e:
+        return jsonify({'error': f'Missing required field: {str(e)}'}), 400
+    except ValueError as e:
+        return jsonify({'error': f'Invalid data format: {str(e)}'}), 400
+    except Exception as e:
+        app.logger.error(f"Error in add_health_record: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/health-records/<int:record_id>', methods=['PUT'])
+@login_required
+def update_health_record(record_id):
+    try:
+        # Find the record and verify it belongs to the current user
+        record = HealthRecord.query.filter_by(id=record_id, user_id=current_user.id).first()
+        
+        if not record:
+            return jsonify({'error': 'Health record not found'}), 404
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        # Update common fields
+        if 'date' in data:
+            record.date = datetime.strptime(data['date'], '%Y-%m-%d').date()
+        if 'time' in data:
+            record.time = data['time']
+        if 'timestamp' in data:
+            record.timestamp = data['timestamp']
+        
+        # Update category-specific fields
+        if record.category in ['vital-signs', 'biometrics']:
+            if 'value' in data:
+                record.value = data['value']
+            
+            if record.type == 'blood-pressure':
+                if 'systolic' in data:
+                    record.systolic = data['systolic']
+                if 'diastolic' in data:
+                    record.diastolic = data['diastolic']
+                
+        elif record.category == 'medical-notes':
+            if 'subject' in data:
+                record.subject = data['subject']
+            if 'body' in data:
+                record.body = data['body']
+        
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Health record updated successfully',
+            'record': record.to_dict()
+        })
+    except ValueError as e:
+        return jsonify({'error': f'Invalid data format: {str(e)}'}), 400
+    except Exception as e:
+        app.logger.error(f"Error in update_health_record: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/health-records/<int:record_id>', methods=['DELETE'])
+@login_required
+def delete_health_record(record_id):
+    try:
+        # Find the record and verify it belongs to the current user
+        record = HealthRecord.query.filter_by(id=record_id, user_id=current_user.id).first()
+        
+        if not record:
+            return jsonify({'error': 'Health record not found'}), 404
+        
+        db.session.delete(record)
+        db.session.commit()
+        
+        return jsonify({'message': 'Health record deleted successfully'})
+    except Exception as e:
+        app.logger.error(f"Error in delete_health_record: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     with app.app_context():

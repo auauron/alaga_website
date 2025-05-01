@@ -55,9 +55,9 @@
               <div class="mb-2"> 
                 <h2 class="text-4xl font-bold text-[#596BC7]">Medications</h2>
                 {% if active_profile %}
-                <p class="text-gray-600 text-sm">&nbsp;Ensure {{ active_profile.care_recipient }} takes their meds on time!</p>
+                <p class="text-gray-600 text-sm">Ensure {{ active_profile.care_recipient }} takes their meds on time!</p>
                 {% else %}
-                <p class="text-gray-600 text-sm">&nbsp;Select a care profile to manage medications</p>
+                <p class="text-gray-600 text-sm">Select a care profile to manage medications</p>
                 {% endif %}
               </div>
             </div>
@@ -93,7 +93,7 @@
         
               <div class="divide-y" id="today-medications">
                 <div class="p-6 text-center text-gray-500" id="today-empty-state">
-                  No medications scheduled for today. Click the + button to add.
+                  No meds scheduled for today. Click the + button to add.
                 </div>
               </div>
             </div>
@@ -105,7 +105,7 @@
         
               <div class="divide-y" id="tomorrow-medications">
                 <div class="p-6 text-center text-gray-500" id="tomorrow-empty-state">
-                  No medications scheduled for tomorrow. Click the + button to add.
+                  No meds scheduled for tomorrow. Click the + button to add.
                 </div>
               </div>
             </div>
@@ -117,7 +117,7 @@
           
               <div class="divide-y" id="upcoming-medications">
                 <div class="p-6 text-center text-gray-500" id="upcoming-empty-state">
-                  No upcoming medications scheduled. Click the + button to add.
+                  No upcoming meds scheduled. Click the + button to add.
                 </div>
               </div>
             </div>
@@ -128,11 +128,11 @@
           <div class="mb-6">
             <div class="mb-2 flex justify-between items-center"> 
               <div>
-                <h2 class="text-4xl font-bold text-[#596BC7]">Medication History</h2>
-                <p class="text-gray-600 text-sm">&nbsp;Track of all medications taken or skipped</p>
+                <h2 class="text-4xl font-bold text-[#596BC7]">Med History</h2>
+                <p class="text-gray-600 text-sm"> {{ active_profile.care_recipient }}'s taken and skipped medications. </p>
               </div>
               <button id="backToMainBtn" class="px-4 py-2 bg-[#BC6FB7] text-white rounded hover:bg-[#E57DDE] transition-colors">
-                Back to Dashboard
+                Back
               </button>
             </div>
           </div>
@@ -144,7 +144,7 @@
 
             <div class="divide-y" id="medication-history">
               <div class="p-6 text-center text-gray-500" id="history-empty-state">
-                No medication history available yet.
+                No med history available yet.
               </div>
             </div>
           </div>
