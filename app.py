@@ -239,6 +239,11 @@ def register():
 def utility_processor():
     return dict(get_initials=get_initials)
 
+@app.route('/upgrade_premium')
+def upgrade_premium():
+    return render_template('upgrade_premium.html')
+
+
 # route for view profile
 def get_initials(name):
     parts = name.strip().split()
