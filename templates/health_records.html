@@ -160,10 +160,10 @@
     <!-- Add Health Record Modal -->
     <div id="addHealthRecordModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
       <div class="bg-white p-6 rounded-lg shadow-lg w-96 max-h-[90vh] overflow-y-auto">
-        <h2 class="text-lg font-semibold mb-4">Add Health Record</h2>
+        <h2 class="text-2xl font-bold mb-4 text-[#8491D3]">Add a Health Record</h2>
         <form id="addHealthRecordForm">
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Category</label>
+            <label class="block text-sm font-medium text-[#DB6774]">Select a health category to get started.</label>
             <select id="recordCategory" name="category" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
               <option value="">Select a category</option>
               <option value="vital-signs">Vital Signs</option>
@@ -173,7 +173,7 @@
           </div>
           
           <div id="vitalSignsOptions" class="mb-4 hidden">
-            <label class="block text-sm font-medium text-gray-700">Vital Sign Type</label>
+            <label class="block text-sm font-medium text-[#BC6FB7]">What vital sign would you like to record?</label>
             <select id="vitalSignType" name="vitalSignType" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
               <option value="">Select a vital sign</option>
               <option value="heart-rate">Heart Rate (BPM)</option>
@@ -186,12 +186,12 @@
           </div>
           
           <div id="biometricsOptions" class="mb-4 hidden">
-            <label class="block text-sm font-medium text-gray-700">Biometric Type</label>
+            <label class="block text-sm font-medium text-[#BC6FB7]">What biometric would you like to record?</label>
             <select id="biometricType" name="biometricType" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
               <option value="">Select a biometric</option>
-              <option value="blood-glucose">Blood Glucose (mg/dL)</option>
+              <option value="blood-glucose">Blood Glucole Levels (mg/dL)</option>
               <option value="cholesterol">Cholesterol Levels (mg/dL)</option>
-              <option value="hemoglobin-a1c">Hemoglobin A1c (%)</option>
+              <option value="hemoglobin-a1c">Hemoglobin a1c (%)</option>
               <option value="creatinine">Creatinine/Kidney Function (GFR)</option>
               <option value="liver-enzymes">Liver Enzymes (U/L)</option>
             </select>
@@ -199,7 +199,7 @@
           
           <!-- Value input for vital signs and biometrics -->
           <div id="valueInput" class="mb-4 hidden">
-            <label class="block text-sm font-medium text-gray-700">Value</label>
+            <label class="block text-sm font-medium text-[#BC6FB7]">Please Add a Value (without units)</label>
             <input type="text" id="recordValue" name="value" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
             
             <!-- Special input for blood pressure -->
@@ -220,22 +220,22 @@
           <!-- Medical notes inputs -->
           <div id="medicalNotesInputs" class="mb-4 hidden">
             <div class="mb-2">
-              <label class="block text-sm font-medium text-gray-700">Subject</label>
+              <label class="block text-sm font-medium text-[#BC6FB7]">What would you like to note for {{ active_profile.care_recipient }}?</label>
               <input type="text" id="noteSubject" name="subject" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Notes (optional)</label>
+              <label class="block text-sm font-medium text-gray-700">Would you like to add more information about it? (optional)</label>
               <textarea id="noteBody" name="body" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md p-2"></textarea>
             </div>
           </div>
           
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Date Taken</label>
+            <label class="block text-sm font-medium text-[#DB6774]">What date was this taken?</label>
             <input type="date" id="dateTaken" name="date" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
           </div>
           
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Time Taken</label>
+            <label class="block text-sm font-medium text-[#DB6774]">What time was this taken?</label>
             <input type="time" id="timeTaken" name="time" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
           </div>
           
@@ -250,9 +250,9 @@
     <!-- Edit Health Records Modal -->
     <div id="editHealthRecordsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
       <div class="bg-white p-6 rounded-lg shadow-lg w-96 max-h-[90vh] overflow-y-auto">
-        <h2 class="text-lg font-semibold mb-4">Edit Health Record</h2>
+        <h2 class="text-2xl font-bold mb-4 text-[#8491D3]">Edit Health Records</h2>
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Select Record</label>
+          <label class="block text-sm font-medium text-[#DB6774] mb-2">What record would you like to edit?</label>
           <select id="healthRecordSelect" class="block w-full border border-gray-300 rounded-md p-2">
             <option value="">Select a record</option>
           </select>
@@ -276,7 +276,7 @@
           </div>
         </form>
         <div id="noRecordSelected" class="text-center text-gray-500 py-4">
-          Please select a record to edit
+          Please select a health record to edit
         </div>
         <div class="flex justify-end mt-4" id="editModalCloseBtn">
           <button type="button" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
