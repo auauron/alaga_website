@@ -1,83 +1,100 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Debug mode - set to true to see console logs
-  const DEBUG = true;
+  const DEBUG = true
 
   function log(...args) {
-    if (DEBUG) console.log(...args);
+    if (DEBUG) console.log(...args)
   }
 
-  log("Todo JS loaded");
+  log("Todo JS loaded")
 
   // Set current date
-  const currentDate = new Date();
-  const dateOptions = { year: "numeric", month: "long", day: "numeric" };
-  document.getElementById("todaysDate").textContent =
-    `Today's date: ${currentDate.toLocaleDateString("en-US", dateOptions)}`;
+  const currentDate = new Date()
+  const dateOptions = { year: "numeric", month: "long", day: "numeric" }
+  const todaysDateElement = document.getElementById("todaysDate")
+  if (todaysDateElement) {
+    todaysDateElement.textContent = `Today's date: ${currentDate.toLocaleDateString("en-US", dateOptions)}`
+  }
 
   // Modal elements
-  const addModal = document.getElementById("addTodoModal");
-  const editModal = document.getElementById("editTasksModal");
-  const deleteModal = document.getElementById("deleteConfirmationModal");
-  const premiumModal = document.getElementById("premiumUpgradeModal");
+  const addModal = document.getElementById("addTodoModal")
+  const editModal = document.getElementById("editTasksModal")
+  const deleteModal = document.getElementById("deleteConfirmationModal")
+  const premiumModal = document.getElementById("premiumUpgradeModal")
 
   // Buttons
-  const openAddModalBtn = document.getElementById("openAddTodo");
-  const cancelAddBtn = document.getElementById("cancelAddTodo");
-  const editTasksBtn = document.getElementById("editTasksBtn");
-  const cancelEditBtn = document.getElementById("cancelEditTask");
-  const deleteTaskBtn = document.getElementById("deleteTaskBtn");
-  const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
-  const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
-  const closePremiumBtn = document.getElementById("closePremiumBtn");
-  const upgradePremiumBtn = document.getElementById("upgradePremiumBtn");
-  const editModalCloseBtn = document.getElementById("editModalCloseBtn");
+  const openAddModalBtn = document.getElementById("openAddTodo")
+  const cancelAddBtn = document.getElementById("cancelAddTodo")
+  const editTasksBtn = document.getElementById("editTasksBtn")
+  const cancelEditBtn = document.getElementById("cancelEditTask")
+  const deleteTaskBtn = document.getElementById("deleteTaskBtn")
+  const cancelDeleteBtn = document.getElementById("cancelDeleteBtn")
+  const confirmDeleteBtn = document.getElementById("confirmDeleteBtn")
+  const closePremiumBtn = document.getElementById("closePremiumModal")
+  const upgradePremiumBtn = document.getElementById("upgradePremiumBtn")
+  const editModalCloseBtn = document.getElementById("editModalCloseBtn")
 
   // Forms and selects
-  const addForm = document.getElementById("addTodoForm");
-  const editForm = document.getElementById("editTaskForm");
-  const taskSelect = document.getElementById("taskSelect");
-  const noTaskSelected = document.getElementById("noTaskSelected");
+  const addForm = document.getElementById("addTodoForm")
+  const editForm = document.getElementById("editTaskForm")
+  const taskSelect = document.getElementById("taskSelect")
+  const noTaskSelected = document.getElementById("noTaskSelected")
 
   // Tasks data
-  let todayTasks = [];
-  let tomorrowTasks = [];
-  let upcomingTasks = [];
-  let selectedTaskId = null;
+  let todayTasks = []
+  let tomorrowTasks = []
+  let upcomingTasks = []
+  let selectedTaskId = null
 
   // Close premium modal
   function closePremiumModal() {
-    premiumModal.classList.add("hidden");
-    premiumModal.classList.remove("flex");
+    log("Closing premium modal")
+    if (premiumModal) {
+      premiumModal.classList.add("hidden")
+      premiumModal.classList.remove("flex")
+    } else {
+      log("Error: Premium modal element not found")
+    }
   }
 
+  // Add event listener for premium modal close button
   if (closePremiumBtn) {
-    closePremiumBtn.addEventListener("click", closePremiumModal);
+    log("Adding event listener to premium modal close button")
+    closePremiumBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      log("Premium modal close button clicked")
+      closePremiumModal()
+    })
+  } else {
+    log("Warning: Premium modal close button not found")
   }
-  
+
+  // Add event listener for premium upgrade button
   if (upgradePremiumBtn) {
-    upgradePremiumBtn.addEventListener("click", () => {
-      alert("This would redirect to the premium upgrade page.");
-      closePremiumModal();
-    });
+    upgradePremiumBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      alert("This would redirect to the premium upgrade page.")
+      closePremiumModal()
+    })
   }
 
   // Close modal when clicking outside
   if (premiumModal) {
     premiumModal.addEventListener("click", (e) => {
       if (e.target === premiumModal) {
-        closePremiumModal();
+        closePremiumModal()
       }
-    });
+    })
   }
 
   // Count total tasks
   function countTotalTasks() {
-    return todayTasks.length + tomorrowTasks.length + upcomingTasks.length;
+    return todayTasks.length + tomorrowTasks.length + upcomingTasks.length
   }
 
   // Check if task limit reached
   function isTaskLimitReached() {
-    return countTotalTasks() >= 5;
+    return countTotalTasks() >= 5
   }
 
   // Open add modal
@@ -85,151 +102,177 @@ document.addEventListener("DOMContentLoaded", () => {
     openAddModalBtn.addEventListener("click", () => {
       // Check task count
       if (isTaskLimitReached()) {
-        premiumModal.classList.remove("hidden");
-        premiumModal.classList.add("flex");
+        if (premiumModal) {
+          premiumModal.classList.remove("hidden")
+          premiumModal.classList.add("flex")
+          log("Showing premium modal")
+        } else {
+          log("Error: Premium modal element not found")
+          alert("You've reached the maximum number of tasks (5). Please upgrade to premium.")
+        }
       } else {
-        addModal.classList.remove("hidden");
-        addModal.classList.add("flex");
+        addModal.classList.remove("hidden")
+        addModal.classList.add("flex")
 
         // Set default date to today
-        const today = new Date();
-        const formattedDate = today.toISOString().split("T")[0];
-        document.getElementById("newTodoDate").value = formattedDate;
+        const today = new Date()
+        const formattedDate = today.toISOString().split("T")[0]
+        const newTodoDateElement = document.getElementById("newTodoDate")
+        if (newTodoDateElement) {
+          newTodoDateElement.value = formattedDate
+        }
       }
-    });
+    })
   }
 
   // Close add modal
   function closeAddModal() {
-    addModal.classList.add("hidden");
-    addModal.classList.remove("flex");
-    addForm.reset();
+    if (addModal) {
+      addModal.classList.add("hidden")
+      addModal.classList.remove("flex")
+    }
+    if (addForm) {
+      addForm.reset()
+    }
   }
 
   if (cancelAddBtn) {
-    cancelAddBtn.addEventListener("click", closeAddModal);
+    cancelAddBtn.addEventListener("click", closeAddModal)
   }
 
   // Close modal when clicking outside
   if (addModal) {
     addModal.addEventListener("click", (e) => {
       if (e.target === addModal) {
-        closeAddModal();
+        closeAddModal()
       }
-    });
+    })
   }
 
   // Open edit modal
   if (editTasksBtn) {
     editTasksBtn.addEventListener("click", () => {
-      populateTaskSelect();
-      editModal.classList.remove("hidden");
-      editModal.classList.add("flex");
-    });
+      populateTaskSelect()
+      editModal.classList.remove("hidden")
+      editModal.classList.add("flex")
+    })
   }
 
   // Close edit modal
   function closeEditModal() {
-    editModal.classList.add("hidden");
-    editModal.classList.remove("flex");
-    editForm.classList.add("hidden");
-    noTaskSelected.classList.remove("hidden");
-    selectedTaskId = null;
+    if (editModal) {
+      editModal.classList.add("hidden")
+      editModal.classList.remove("flex")
+    }
+    if (editForm) {
+      editForm.classList.add("hidden")
+    }
+    if (noTaskSelected) {
+      noTaskSelected.classList.remove("hidden")
+    }
+    selectedTaskId = null
   }
 
   if (editModalCloseBtn) {
-    editModalCloseBtn.addEventListener("click", closeEditModal);
+    editModalCloseBtn.addEventListener("click", closeEditModal)
   }
-  
+
   if (cancelEditBtn) {
-    cancelEditBtn.addEventListener("click", closeEditModal);
+    cancelEditBtn.addEventListener("click", closeEditModal)
   }
 
   // Close modal when clicking outside
   if (editModal) {
     editModal.addEventListener("click", (e) => {
       if (e.target === editModal) {
-        closeEditModal();
+        closeEditModal()
       }
-    });
+    })
   }
 
   // Open delete confirmation modal
   if (deleteTaskBtn) {
     deleteTaskBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      deleteModal.classList.remove("hidden");
-      deleteModal.classList.add("flex");
-    });
+      e.preventDefault()
+      deleteModal.classList.remove("hidden")
+      deleteModal.classList.add("flex")
+    })
   }
 
   // Close delete confirmation modal
   function closeDeleteModal() {
-    deleteModal.classList.add("hidden");
-    deleteModal.classList.remove("flex");
+    if (deleteModal) {
+      deleteModal.classList.add("hidden")
+      deleteModal.classList.remove("flex")
+    }
   }
 
   if (cancelDeleteBtn) {
-    cancelDeleteBtn.addEventListener("click", closeDeleteModal);
+    cancelDeleteBtn.addEventListener("click", closeDeleteModal)
   }
 
   // Close modal when clicking outside
   if (deleteModal) {
     deleteModal.addEventListener("click", (e) => {
       if (e.target === deleteModal) {
-        closeDeleteModal();
+        closeDeleteModal()
       }
-    });
+    })
   }
 
   // Populate task select dropdown
   function populateTaskSelect() {
+    if (!taskSelect) {
+      log("Error: Task select element not found")
+      return
+    }
+
     // Clear existing options except the first one
     while (taskSelect.options.length > 1) {
-      taskSelect.remove(1);
+      taskSelect.remove(1)
     }
 
     // Add all tasks to select
-    const allTasks = [...todayTasks, ...tomorrowTasks, ...upcomingTasks];
+    const allTasks = [...todayTasks, ...tomorrowTasks, ...upcomingTasks]
     allTasks.forEach((task) => {
-      const option = document.createElement("option");
-      option.value = task.id;
-      option.textContent = `${task.text} (${formatShortDate(new Date(task.date))})`;
-      taskSelect.appendChild(option);
-    });
+      const option = document.createElement("option")
+      option.value = task.id
+      option.textContent = `${task.text} (${formatShortDate(new Date(task.date))})`
+      taskSelect.appendChild(option)
+    })
   }
 
   // Handle task selection
   if (taskSelect) {
     taskSelect.addEventListener("change", function () {
-      const selectedId = this.value;
+      const selectedId = this.value
 
       if (selectedId) {
-        selectedTaskId = parseInt(selectedId);
-        const allTasks = [...todayTasks, ...tomorrowTasks, ...upcomingTasks];
-        const task = allTasks.find((t) => t.id == selectedId);
+        selectedTaskId = Number.parseInt(selectedId)
+        const allTasks = [...todayTasks, ...tomorrowTasks, ...upcomingTasks]
+        const task = allTasks.find((t) => t.id == selectedId)
 
         if (task) {
           // Fill form with task data
-          editForm.elements.text.value = task.text;
+          editForm.elements.text.value = task.text
           // Convert date format from ISO to YYYY-MM-DD for input field
-          const dateObj = new Date(task.date);
-          const formattedDate = dateObj.toISOString().split('T')[0];
-          editForm.elements.date.value = formattedDate;
+          const dateObj = new Date(task.date)
+          const formattedDate = dateObj.toISOString().split("T")[0]
+          editForm.elements.date.value = formattedDate
 
           // Show form, hide message
-          editForm.classList.remove("hidden");
-          noTaskSelected.classList.add("hidden");
-          editModalCloseBtn.classList.add("hidden");
+          editForm.classList.remove("hidden")
+          noTaskSelected.classList.add("hidden")
+          editModalCloseBtn.classList.add("hidden")
         }
       } else {
         // Hide form, show message
-        editForm.classList.add("hidden");
-        noTaskSelected.classList.remove("hidden");
-        editModalCloseBtn.classList.remove("hidden");
-        selectedTaskId = null;
+        editForm.classList.add("hidden")
+        noTaskSelected.classList.remove("hidden")
+        editModalCloseBtn.classList.remove("hidden")
+        selectedTaskId = null
       }
-    });
+    })
   }
 
   // Confirm delete
@@ -237,58 +280,58 @@ document.addEventListener("DOMContentLoaded", () => {
     confirmDeleteBtn.addEventListener("click", () => {
       if (selectedTaskId) {
         // Delete from server
-        deleteTodoFromServer(selectedTaskId);
+        deleteTodoFromServer(selectedTaskId)
 
         // Close modals
-        closeDeleteModal();
-        closeEditModal();
+        closeDeleteModal()
+        closeEditModal()
 
         // Clear the selected task ID
-        selectedTaskId = null;
+        selectedTaskId = null
       }
-    });
+    })
   }
 
   // Handle form submission for adding task
   if (addForm) {
     addForm.addEventListener("submit", (e) => {
-      e.preventDefault();
+      e.preventDefault()
 
-      const formData = new FormData(addForm);
+      const formData = new FormData(addForm)
       const task = {
         text: formData.get("text"),
         date: formData.get("date"),
         completed: false,
-      };
+      }
 
       // Add task to server
-      addTodoToServer(task);
+      addTodoToServer(task)
 
       // Close modal and reset form
-      closeAddModal();
-    });
+      closeAddModal()
+    })
   }
 
   // Handle form submission for editing task
   if (editForm) {
     editForm.addEventListener("submit", (e) => {
-      e.preventDefault();
+      e.preventDefault()
 
       if (selectedTaskId) {
-        const formData = new FormData(editForm);
+        const formData = new FormData(editForm)
         const updatedTask = {
           text: formData.get("text"),
           date: formData.get("date"),
           completed: false, // Reset completion status when edited
-        };
+        }
 
         // Update task on server
-        updateTodoOnServer(selectedTaskId, updatedTask);
+        updateTodoOnServer(selectedTaskId, updatedTask)
 
         // Close modal
-        closeEditModal();
+        closeEditModal()
       }
-    });
+    })
   }
 
   // Check if two dates are the same day
@@ -297,54 +340,54 @@ document.addEventListener("DOMContentLoaded", () => {
       date1.getFullYear() === date2.getFullYear() &&
       date1.getMonth() === date2.getMonth() &&
       date1.getDate() === date2.getDate()
-    );
+    )
   }
 
   // Format date for display in upcoming tasks (e.g., "May 1")
   function formatShortDate(date) {
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
   }
 
   // Render all tasks
   function renderTasks() {
-    renderTaskList("today", todayTasks);
-    renderTaskList("tomorrow", tomorrowTasks);
-    renderTaskList("upcoming", upcomingTasks);
+    renderTaskList("today", todayTasks)
+    renderTaskList("tomorrow", tomorrowTasks)
+    renderTaskList("upcoming", upcomingTasks)
   }
 
   // Render a specific task list
   function renderTaskList(type, tasks) {
-    const container = document.getElementById(`${type}-tasks`);
-    if (!container) return;
-    
-    const emptyState = document.getElementById(`${type}-empty-state`);
-    if (!emptyState) return;
+    const container = document.getElementById(`${type}-tasks`)
+    if (!container) return
+
+    const emptyState = document.getElementById(`${type}-empty-state`)
+    if (!emptyState) return
 
     // Clear existing tasks (except empty state)
     Array.from(container.children).forEach((child) => {
       if (child !== emptyState) {
-        child.remove();
+        child.remove()
       }
-    });
+    })
 
     // Reset visibility of empty state
-    emptyState.style.display = "block";
+    emptyState.style.display = "block"
 
     if (tasks.length > 0) {
-      emptyState.style.display = "none";
+      emptyState.style.display = "none"
 
       tasks.forEach((task) => {
-        const taskElement = createTaskElement(task, type);
-        container.appendChild(taskElement);
-      });
+        const taskElement = createTaskElement(task, type)
+        container.appendChild(taskElement)
+      })
     }
   }
 
   // Create task element
   function createTaskElement(task, section) {
-    const div = document.createElement("div");
-    div.className = "p-4 flex items-center justify-between task-card";
-    div.dataset.id = task.id;
+    const div = document.createElement("div")
+    div.className = "p-4 flex items-center justify-between task-card"
+    div.dataset.id = task.id
 
     // Create inner HTML based on section
     if (section === "upcoming") {
@@ -359,7 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="text-xs text-gray-500 ml-2">(${formatShortDate(new Date(task.date))})</span>
           </label>
         </div>
-      `;
+      `
     } else {
       div.innerHTML = `
         <div class="flex items-center">
@@ -371,154 +414,162 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="task-text">${task.text}</span>
           </label>
         </div>
-      `;
+      `
     }
 
     // Add event listener for checkbox
     setTimeout(() => {
-      const checkbox = div.querySelector('input[type="checkbox"]');
-      checkbox.addEventListener("change", () => {
-        const taskId = div.dataset.id;
-        const allTasks = [...todayTasks, ...tomorrowTasks, ...upcomingTasks];
-        const task = allTasks.find((t) => t.id == taskId);
+      const checkbox = div.querySelector('input[type="checkbox"]')
+      if (checkbox) {
+        checkbox.addEventListener("change", () => {
+          const taskId = div.dataset.id
+          const allTasks = [...todayTasks, ...tomorrowTasks, ...upcomingTasks]
+          const task = allTasks.find((t) => t.id == taskId)
 
-        if (task) {
-          // Update the task's completed status
-          task.completed = checkbox.checked;
-          
-          // Update on server
-          updateTodoOnServer(taskId, { completed: checkbox.checked });
-        }
-      });
-    }, 0);
+          if (task) {
+            // Update the task's completed status
+            task.completed = checkbox.checked
 
-    return div;
+            // Update on server
+            updateTodoOnServer(taskId, { completed: checkbox.checked })
+          }
+        })
+      }
+    }, 0)
+
+    return div
   }
 
   // API Functions
 
   // Load todos from server
   function loadTodosFromServer() {
-    log("Loading todos from server");
+    log("Loading todos from server")
     fetch("/api/todos")
       .then((response) => {
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`)
         }
-        return response.json();
+        return response.json()
       })
       .then((data) => {
-        log("Received todos from server:", data);
-        todayTasks = data.today || [];
-        tomorrowTasks = data.tomorrow || [];
-        upcomingTasks = data.upcoming || [];
-        renderTasks();
+        log("Received todos from server:", data)
+        todayTasks = data.today || []
+        tomorrowTasks = data.tomorrow || []
+        upcomingTasks = data.upcoming || []
+        renderTasks()
       })
       .catch((error) => {
-        log("Error loading todos:", error);
+        log("Error loading todos:", error)
         // Initialize with empty arrays if there's an error
-        todayTasks = [];
-        tomorrowTasks = [];
-        upcomingTasks = [];
-        renderTasks();
-      });
+        todayTasks = []
+        tomorrowTasks = []
+        upcomingTasks = []
+        renderTasks()
+      })
   }
 
   // Add todo to server
   function addTodoToServer(todo) {
-    log("Adding todo to server:", todo);
+    log("Adding todo to server:", todo)
     fetch("/api/todos", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(todo),
-      credentials: 'same-origin'
+      credentials: "same-origin",
     })
       .then((response) => {
         if (!response.ok) {
           if (response.status === 403) {
             // Premium limit reached
-            premiumModal.classList.remove("hidden");
-            premiumModal.classList.add("flex");
-            throw new Error("Premium limit reached");
+            if (premiumModal) {
+              premiumModal.classList.remove("hidden")
+              premiumModal.classList.add("flex")
+              log("Showing premium modal due to 403 response")
+            } else {
+              log("Error: Premium modal element not found")
+              alert("You've reached the maximum number of tasks (5). Please upgrade to premium.")
+            }
+            throw new Error("Premium limit reached")
           }
-          return response.json().then(err => {
-            throw new Error(err.error || `HTTP error! Status: ${response.status}`);
-          });
+          return response.json().then((err) => {
+            throw new Error(err.error || `HTTP error! Status: ${response.status}`)
+          })
         }
-        return response.json();
+        return response.json()
       })
       .then((data) => {
-        log("Server response after adding todo:", data);
+        log("Server response after adding todo:", data)
         // Reload todos from server
-        loadTodosFromServer();
+        loadTodosFromServer()
       })
       .catch((error) => {
-        log("Error adding todo:", error);
+        log("Error adding todo:", error)
         // If not a premium error, show general error
         if (!error.message.includes("Premium")) {
-          alert("There was an error adding the todo: " + error.message);
+          alert("There was an error adding the todo: " + error.message)
         }
-      });
+      })
   }
 
   // Update todo on server
   function updateTodoOnServer(todoId, updatedFields) {
-    log("Updating todo on server:", todoId, updatedFields);
+    log("Updating todo on server:", todoId, updatedFields)
     fetch(`/api/todos/${todoId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(updatedFields),
-      credentials: 'same-origin'
+      credentials: "same-origin",
     })
       .then((response) => {
         if (!response.ok) {
-          return response.json().then(err => {
-            throw new Error(err.error || `HTTP error! Status: ${response.status}`);
-          });
+          return response.json().then((err) => {
+            throw new Error(err.error || `HTTP error! Status: ${response.status}`)
+          })
         }
-        return response.json();
+        return response.json()
       })
       .then((data) => {
-        log("Server response after updating todo:", data);
+        log("Server response after updating todo:", data)
         // Reload todos from server
-        loadTodosFromServer();
+        loadTodosFromServer()
       })
       .catch((error) => {
-        log("Error updating todo:", error);
-        alert("There was an error updating the todo: " + error.message);
-      });
+        log("Error updating todo:", error)
+        alert("There was an error updating the todo: " + error.message)
+      })
   }
 
   // Delete todo from server
   function deleteTodoFromServer(todoId) {
-    log("Deleting todo from server:", todoId);
+    log("Deleting todo from server:", todoId)
     fetch(`/api/todos/${todoId}`, {
       method: "DELETE",
-      credentials: 'same-origin'
+      credentials: "same-origin",
     })
       .then((response) => {
         if (!response.ok) {
-          return response.json().then(err => {
-            throw new Error(err.error || `HTTP error! Status: ${response.status}`);
-          });
+          return response.json().then((err) => {
+            throw new Error(err.error || `HTTP error! Status: ${response.status}`)
+          })
         }
-        return response.json();
+        return response.json()
       })
       .then((data) => {
-        log("Server response after deleting todo:", data);
+        log("Server response after deleting todo:", data)
         // Reload todos from server
-        loadTodosFromServer();
+        loadTodosFromServer()
       })
       .catch((error) => {
-        log("Error deleting todo:", error);
-        alert("There was an error deleting the todo: " + error.message);
-      });
+        log("Error deleting todo:", error)
+        alert("There was an error deleting the todo: " + error.message)
+      })
   }
 
   // Initialize the app
-  loadTodosFromServer();
-});
+  loadTodosFromServer()
+})

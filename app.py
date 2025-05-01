@@ -397,7 +397,6 @@ def todo():
     initials = get_initials(fullname)
     return render_template('todo.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile)
 
-# Updated medications route to include backend data
 #route for medications page
 @app.route('/medications', methods=['GET'])
 @login_required
@@ -844,26 +843,51 @@ def add_health_record():
         
         profile_id = session.get('active_profile_id')
         
-        # Count unique types for vital signs and biometrics
-        unique_vital_signs = db.session.query(HealthRecord.type).filter(
-            HealthRecord.user_id == current_user.id,
-            HealthRecord.category == 'vital-signs'
-        ).distinct().count()
-        
-        unique_biometrics = db.session.query(HealthRecord.type).filter(
-            HealthRecord.user_id == current_user.id,
-            HealthRecord.category == 'biometrics'
-        ).distinct().count()
-        
-        medical_notes_count = HealthRecord.query.filter_by(
-            user_id=current_user.id,
-            category='medical-notes'
-        ).count()
-        
         # Check if user has reached the health record limit (3 for free users)
-        total_record_types = unique_vital_signs + unique_biometrics + medical_notes_count
-        if total_record_types >= 3:
-            return jsonify({'error': 'You have reached the maximum number of health record types (3). Please upgrade to premium.'}), 403
+        profile_id = session.get('active_profile_id')
+        if profile_id:
+            # Count unique types for vital signs and biometrics for this profile
+            unique_vital_signs = db.session.query(HealthRecord.type).filter(
+                HealthRecord.user_id == current_user.id,
+                HealthRecord.profile_id == profile_id,
+                HealthRecord.category == 'vital-signs'
+            ).distinct().count()
+            
+            unique_biometrics = db.session.query(HealthRecord.type).filter(
+                HealthRecord.user_id == current_user.id,
+                HealthRecord.profile_id == profile_id,
+                HealthRecord.category == 'biometrics'
+            ).distinct().count()
+            
+            medical_notes_count = HealthRecord.query.filter_by(
+                user_id=current_user.id,
+                profile_id=profile_id,
+                category='medical-notes'
+            ).count()
+            
+            total_record_types = unique_vital_signs + unique_biometrics + (1 if medical_notes_count > 0 else 0)
+            if total_record_types >= 3:
+                return jsonify({'error': 'You have reached the maximum number of health record types (3). Please upgrade to premium.'}), 403
+        else:
+            # If no profile is selected, count all health records for this user
+            unique_vital_signs = db.session.query(HealthRecord.type).filter(
+                HealthRecord.user_id == current_user.id,
+                HealthRecord.category == 'vital-signs'
+            ).distinct().count()
+            
+            unique_biometrics = db.session.query(HealthRecord.type).filter(
+                HealthRecord.user_id == current_user.id,
+                HealthRecord.category == 'biometrics'
+            ).distinct().count()
+            
+            medical_notes_count = HealthRecord.query.filter_by(
+                user_id=current_user.id,
+                category='medical-notes'
+            ).count()
+            
+            total_record_types = unique_vital_signs + unique_biometrics + (1 if medical_notes_count > 0 else 0)
+            if total_record_types >= 3:
+                return jsonify({'error': 'You have reached the maximum number of health record types (3). Please upgrade to premium.'}), 403
         
         # Convert string date to datetime object
         date = datetime.strptime(data['date'], '%Y-%m-%d').date()
