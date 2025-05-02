@@ -111,7 +111,7 @@
                   {% for med in medications %}
                     <div class="p-4 flex items-center justify-between transition hover:bg-gray-50">
                       <div class="flex items-start">
-                        <div class="bg-blue-100 p-2 rounded-full mr-3">
+                        <div class="p-2 rounded-full mr-3">
                           {% if med.dosage_type == 'tablet' %}
                             <i class="fa-solid fa-tablets" style="color: #fc9682;"></i>
                           {% elif med.dosage_type == 'capsule' %}
@@ -167,7 +167,7 @@
                 {% for record in health_records %}
                   <div class="p-4 flex items-center justify-between transition hover:bg-gray-50">
                     <div class="flex items-center">
-                      <div class="bg-{{ 'red' if record.category == 'vital-signs' else 'blue' }}-100 p-2 rounded-full mr-3">
+                      <div class="p-2 rounded-full mr-3">
                         {% if record.category == 'vital-signs' %}
                           {% if record.type == 'blood-pressure' %}
                             <i class="fa-solid fa-droplet" style="color: #b10606;"></i>

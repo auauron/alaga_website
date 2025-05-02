@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", () => {
   // Set current date
   const currentDate = new Date()
@@ -763,7 +764,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // Update status label
-      statusLabel.textContent = "Status"
+      statusLabel.textContent = ""
       statusLabel.classList.remove("text-green-500", "text-red-500")
       statusLabel.classList.add("text-gray-400")
 
@@ -918,15 +919,44 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
+  function syncMedicationStatus() {
+    // First load the latest medication history
+    fetch("/api/medication-history")
+      .then((response) => {
+        if (!response.ok) {
+          if (response.status === 400) {
+            // No active profile selected, this is expected
+            return { history: [] }
+          }
+          throw new Error("Failed to load medication history")
+        }
+        return response.json()
+      })
+      .then((data) => {
+        if (data.history) {
+          medicationHistory = data.history
+          // After updating the history data, re-render medications to update button states
+          renderMedications()
+        }
+      })
+      .catch((error) => {
+        console.error("Error syncing medication status:", error)
+      })
+  }
   // Initialize the app - load data when page loads and when active profile changes
   loadMedications()
   loadMedicationHistory()
+  syncMedicationStatus()
 
   // Add event listener for page visibility changes to refresh data when user returns to the page
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
       loadMedications()
       loadMedicationHistory()
+      syncMedicationStatus()
     }
+  })
+  window.addEventListener("focus", () => {
+    syncMedicationStatus()
   })
 })
