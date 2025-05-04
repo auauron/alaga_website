@@ -27,7 +27,7 @@
         {% endfor %}
       </div>
       {% if profiles|length < 3 %}
-        <a href="{{ url_for('care_profiles') }}" class="w-full block text-sm text-white/60 hover:text-white mt-2 text-left pl-2"> + Add Profiles </a>
+        <a href="{{ url_for('care_profiles') }}" class="w-full block text-sm text-white/60 hover:text-white mt-2 text-left pl-2"> + Add/Edit Profiles </a>
       {% else %}
         <a href="{{ url_for('care_profiles')}}" class="w-full block text-sm text-white/60 hover:text-white mt-2 text-left pl-2"> View Care Profiles </a>
       {% endif %}
