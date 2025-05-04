@@ -63,20 +63,7 @@
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="bg-white py-3 px-6 shadow-sm flex items-center justify-between">
-          <div class="flex items-center">
-            <button onclick="toggleSidebar()" class="mr-4 md:hidden">
-              <i class="fa-solid fa-bars fa-lg" style="color: #8491d3;"></i>
-            </button>
-            <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="h-8 w-8 mr-2">
-            <h2 class="text-3xl font-bold text-[#BC6FB7]">Alaga</h2>
-          </div>
-          <div class="flex items-center space-x-4">
-            <button class="text-gray-500 hover:text-gray-700">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-            </button>
-          </div>
-        </header>
+        {% include 'includes/header.html' %}
 
         <main class="flex-1 overflow-auto p-6">
           <!-- TO DO -->
