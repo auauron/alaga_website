@@ -42,10 +42,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   closePremiumBtn.addEventListener("click", closePremiumModal)
-  upgradePremiumBtn.addEventListener("click", () => {
-    alert("This would redirect to the premium upgrade page.")
-    closePremiumModal()
-  })
+  
+  // fix - added a condition kung ga exist ang btn 
+  if (upgradePremiumBtn) {
+    upgradePremiumBtn.addEventListener("click", () => {
+      alert("This would redirect to the premium upgrade page.")
+      closePremiumModal()
+    })
+  }
 
   // Close modal when clicking outside
   premiumModal.addEventListener("click", (e) => {
@@ -54,14 +58,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   })
 
-  // Open add modal
+  // Open add modal - fix - added error handlng condition
   openAddModalBtn.addEventListener("click", () => {
     // Check medication count from the server
     fetch("/api/medications")
       .then((response) => response.json())
       .then((data) => {
         if (data.error) {
-          alert(data.error)
+          console.error("Error:", data.error)
+          // fall back if there's an error
+          if (medications.length >= 3) {
+            premiumModal.classList.remove("hidden")
+            premiumModal.classList.add("flex")
+          } else {
+            addModal.classList.remove("hidden")
+            addModal.classList.add("flex")
+          }
           return
         }
 
@@ -75,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((error) => {
         console.error("Error checking medication count:", error)
-        // Fallback to client-side check
+        //  fix -- catch error
         if (medications.length >= 3) {
           premiumModal.classList.remove("hidden")
           premiumModal.classList.add("flex")
@@ -150,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   })
 
-  // Confirm delete
+  // Confirm delete - fix - added error handling like the ones above
   confirmDeleteBtn.addEventListener("click", () => {
     if (selectedMedicationId) {
       // Delete medication from server
@@ -186,6 +198,14 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch((error) => {
           console.error("Error deleting medication:", error)
           alert("Failed to delete medication. Please try again.")
+          
+          // even if server fails, add fallbacks:
+          medications = medications.filter((med) => med.id != selectedMedicationId)
+          closeDeleteModal()
+          closeEditModal()
+          selectedMedicationId = null
+          renderMedications()
+          populateMedicationSelect()
         })
     }
   })
@@ -250,7 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   })
 
-  // Handle form submission for adding medication
+  // Handle form submission for adding medication - fix-- added error handling again
   addForm.addEventListener("submit", (e) => {
     e.preventDefault()
 
@@ -290,10 +310,20 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch((error) => {
         console.error("Error adding medication:", error)
         alert(error.message || "Failed to add medication. Please try again.")
+        
+        // fallback
+        const tempMedication = {
+          ...medication,
+          id: Date.now().toString() // Temporary ID
+        }
+        medications.push(tempMedication)
+        renderMedications()
+        closeAddModal()
+        addForm.reset()
       })
   })
 
-  // Handle form submission for editing medication
+  // Handle form submission for editing medication - fix - added error handling
   editForm.addEventListener("submit", (e) => {
     e.preventDefault()
 
@@ -338,11 +368,25 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch((error) => {
           console.error("Error updating medication:", error)
           alert("Failed to update medication. Please try again.")
+          
+          //= fallback - still update if server fails
+          const tempUpdatedMedication = {
+            ...updatedMedication,
+            id: selectedMedicationId
+          }
+          medications = medications.map((med) => {
+            if (med.id == selectedMedicationId) {
+              return tempUpdatedMedication
+            }
+            return med
+          })
+          renderMedications()
+          closeEditModal()
         })
     }
   })
 
-  // Load medications from server
+  // Load medications from server - fix added error handling
   function loadMedications() {
     fetch("/api/medications")
       .then((response) => {
@@ -363,10 +407,13 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((error) => {
         console.error("Error loading medications:", error)
+        // If we can't load from server, initialize using empty array
+        medications = []
+        renderMedications()
       })
   }
 
-  // Load medication history from server
+  // Load medication history from server -- fix again
   function loadMedicationHistory() {
     fetch("/api/medication-history")
       .then((response) => {
@@ -387,6 +434,9 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((error) => {
         console.error("Error loading medication history:", error)
+        // If we can't load from server, initialize with empty array
+        medicationHistory = []
+        renderMedicationHistory()
       })
   }
 
@@ -398,6 +448,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const todayEmptyState = document.getElementById("today-empty-state")
     const tomorrowEmptyState = document.getElementById("tomorrow-empty-state")
     const upcomingEmptyState = document.getElementById("upcoming-empty-state")
+
+    // Check if elements exist before proceeding
+    if (!todayContainer || !tomorrowContainer || !upcomingContainer || 
+        !todayEmptyState || !tomorrowEmptyState || !upcomingEmptyState) {
+      console.error("Required DOM elements not found")
+      return
+    }
 
     // Clear existing medications (except empty state)
     Array.from(todayContainer.children).forEach((child) => {
@@ -504,6 +561,12 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderMedicationHistory() {
     const historyContainer = document.getElementById("medication-history")
     const historyEmptyState = document.getElementById("history-empty-state")
+
+    // Check if elements exist before proceeding
+    if (!historyContainer || !historyEmptyState) {
+      console.error("Required DOM elements for history not found")
+      return
+    }
 
     // Clear existing history items (except empty state)
     Array.from(historyContainer.children).forEach((child) => {
@@ -739,7 +802,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return div
   }
 
-  // Handle medication status changes (taken or skipped)
+  // Handle medication status changes (taken or skipped) - fix - added error handling
   function handleMedicationStatus(medication, activeBtn, otherBtn, statusLabel, status) {
     const today = new Date().toISOString().split("T")[0]
 
@@ -763,7 +826,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // Update status label
-      statusLabel.textContent = ""
+      statusLabel.textContent = " "
       statusLabel.classList.remove("text-green-500", "text-red-500")
       statusLabel.classList.add("text-gray-400")
 
@@ -822,7 +885,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Delete medication history entry
+  // Delete medication history entry - fix - added error handling
   function deleteMedicationHistory(medicationId, date) {
     // First find the history entry ID if it exists
     fetch("/api/medication-history")
@@ -853,16 +916,24 @@ document.addEventListener("DOMContentLoaded", () => {
               })
               .catch((error) => {
                 console.error("Error deleting medication history:", error)
+                // still update even if the server fails - condition
+                if (!historyPage.classList.contains("hidden")) {
+                  renderMedicationHistory()
+                }
               })
           }
         }
       })
       .catch((error) => {
         console.error("Error finding medication history to delete:", error)
+        // still update 
+        if (!historyPage.classList.contains("hidden")) {
+          renderMedicationHistory()
+        }
       })
   }
 
-  // Update medication status and add to history
+  // Update medication status and add to history - fix - added error handling
   function updateMedicationStatus(id, status) {
     // Send to server
     fetch("/api/medication-history", {
@@ -890,9 +961,10 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((error) => {
         console.error("Error updating medication status:", error)
-        // If there was an error, reload to get the correct state
-        loadMedicationHistory()
-        renderMedications()
+        // If there was an error, still update instead of loading
+        if (!historyPage.classList.contains("hidden")) {
+          renderMedicationHistory()
+        }
       })
   }
 
@@ -918,6 +990,8 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
+
+  //fix - still render even if syncing errors
   function syncMedicationStatus() {
     // First load the latest medication history
     fetch("/api/medication-history")
@@ -938,10 +1012,12 @@ document.addEventListener("DOMContentLoaded", () => {
           renderMedications()
         }
       })
-      .catch((error) => {
+      .catch((error) => { // added a condition
         console.error("Error syncing medication status:", error)
+        renderMedications()
       })
   }
+  
   // Initialize the app - load data when page loads and when active profile changes
   loadMedications()
   loadMedicationHistory()
@@ -955,6 +1031,7 @@ document.addEventListener("DOMContentLoaded", () => {
       syncMedicationStatus()
     }
   })
+  
   window.addEventListener("focus", () => {
     syncMedicationStatus()
   })
