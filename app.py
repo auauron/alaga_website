@@ -248,10 +248,21 @@ def register():
     return render_template('register.html', form=form)
 
 # route for the upgrade to premium page
-@app.route('/upgrade_premium')
+@app.route('/upgrade_premium', methods=['GET', 'POST']) 
 @login_required
 def upgrade_premium():
-    return render_template('upgrade_premium.html')
+    # Your existing todo route code
+    profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+    
+    profile_id = session.get('active_profile_id')
+    active_profile = None
+    
+    if profile_id:
+        active_profile = CareProfile.query.get(profile_id)
+    
+    fullname = current_user.fullname
+    initials = get_initials(fullname)
+    return render_template('upgrade_premium.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile)
 
 # route for the profile page
 @app.route('/view_profile', methods=['GET', 'POST'])
