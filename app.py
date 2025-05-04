@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired, Length, ValidationError
 import os
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
-from werkzeug.urls import url_encode, quote as url_quote
+from urllib.parse import urlencode, quote as url_quote
 import traceback
 
 app = Flask(__name__)
