@@ -39,11 +39,11 @@
         <main class="flex-1 overflow-auto p-6" id="main-content">
           <div class="mb-6">
             <div class="mb-2"> 
-              <h2 class="text-4xl font-bold text-[#596BC7]">Health Records</h2>
+              <h2 class="text-4xl font-bold text-[#596BC7]">Medications</h2>
               {% if active_profile %}
-                <p class="text-gray-600 text-sm">&nbsp;Keep track of {{ active_profile.care_recipient }}'s well-being</p>
+                <p class="text-gray-600 text-sm">&nbsp;Ensure {{ active_profile.care_recipient }} takes their meds on time!</p>
               {% else %}
-                <p class="text-gray-600 text-sm">&nbsp;Keep track of your loved one's well-being</p>
+                <p class="text-gray-600 text-sm">&nbsp;Ensure your loved one takes their meds on time!</p>
               {% endif %}
             </div>
             <div class="bg-gradient-to-r from-pink-400 to-purple-500 rounded-lg p-4 text-white flex items-center justify-between">
