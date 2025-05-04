@@ -1,3 +1,7 @@
 Flask
-Gunicorn
-flask_sqlalchemy
+Flask-SQLAlchemy
+Flask-Login
+Flask-WTF
+WTForms
+Flask-Bcrypt
+gunicorn
