@@ -1,18 +1,15 @@
-from flask import Flask, request
-import sys
-import os
+from flask import Flask
 
-# Add the parent directory to sys.path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+app = Flask(__name__)
 
-# Import your Flask app
-from app import app as flask_app
+@app.route('/')
+def home():
+    return "Hello from Flask on Vercel!"
 
-# This is the Vercel serverless function entry point
-@flask_app.route('/', defaults={'path': ''})
-@flask_app.route('/<path:path>')
-def catch_all(path):
-    return flask_app.dispatch_request()
+@app.route('/about')
+def about():
+    return "About page"
 
-# Export the Flask app as "app" for Vercel
-app = flask_app
+# This is the handler Vercel will call
+def handler(request):
+    return app(request)

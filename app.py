@@ -8,6 +8,7 @@ import os
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
 import traceback
+from api.index import app
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.root_path, 'database.db')
@@ -1089,6 +1090,5 @@ def get_initials(name):
     return initials
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+    # This is used when running locally
+    app.run(host='0.0.0.0', port=8000, debug=True)
