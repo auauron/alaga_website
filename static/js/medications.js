@@ -718,7 +718,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ? '<span class="mr-2 text-green-500 font-medium">Taken</span>'
             : '<span class="mr-2 text-red-500 font-medium">Skip</span>'
       } else {
-        statusLabel = '<span class="mr-2 text-gray-400 font-medium">Status</span>'
+        statusLabel = '<span class="mr-2 text-gray-400 font-medium"></span>'
       }
 
       div.innerHTML = `
@@ -727,7 +727,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="ml-4">
               <h4 class="font-medium">${medication.name}</h4>
               <p class="text-sm text-gray-500">${medication.dosage}</p>
-              ${medication.instructions ? `<p class="text-sm text-gray-500">Instructions: ${medication.instructions}</p>` : ""}
+              ${medication.instructions ? `<p class="text-sm text-gray-500">IN: ${medication.instructions}</p>` : ""}
             </div>
           </div>
           <div class="flex items-center">
@@ -775,7 +775,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="ml-4">
           <h4 class="font-medium">${medication.name}</h4>
           <p class="text-sm text-gray-500">${medication.dosage}</p>
-          ${medication.instructions ? `<p class="text-sm text-gray-500">Instructions: ${medication.instructions}</p>` : ""}
+          ${medication.instructions ? `<p class="text-sm text-gray-500">IN: ${medication.instructions}</p>` : ""}
         </div>
       </div>
       <div class="flex items-center">
@@ -790,7 +790,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="ml-4">
               <h4 class="font-medium">${medication.name}</h4>
               <p class="text-sm text-gray-500">${medication.dosage}</p>
-              ${medication.instructions ? `<p class="text-sm text-gray-500">Instructions: ${medication.instructions}</p>` : ""}
+              ${medication.instructions ? `<p class="text-sm text-gray-500">IN: ${medication.instructions}</p>` : ""}
             </div>
           </div>
           <div class="flex items-center">
