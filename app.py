@@ -188,10 +188,12 @@ class HealthRecord(db.Model):
         return result
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ROUTES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-@app.route('/about')
+#route for about us page 
+@app.route('/about') 
 def about_us():
     return render_template('about_us.html')
 
+#app route for home
 @app.route('/')
 def home():
     return render_template('home.html')
