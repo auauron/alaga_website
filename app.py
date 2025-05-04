@@ -7,8 +7,8 @@ from wtforms.validators import InputRequired, Length, ValidationError
 import os
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
+from werkzeug.urls import url_encode, quote as url_quote
 import traceback
-from api.index import app
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.root_path, 'database.db')
@@ -204,11 +204,6 @@ def home():
 def start():
     return render_template('start.html')
 
-# Initialize the database if it doesn't exist
-@app.before_first_request
-def create_tables():
-    db.create_all()
-    
 # route for the login page
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -1095,5 +1090,6 @@ def get_initials(name):
     return initials
 
 if __name__ == '__main__':
-    # This is used when running locally
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
