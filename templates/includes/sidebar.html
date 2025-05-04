@@ -65,6 +65,7 @@
 
     <!-- User Profile -->
     <div class="pt-3">
+
       <a href="{{ url_for('view_profile') }}" class="w-full flex items-center space-x-3 {% if request.endpoint == 'view_profile' %}bg-white/10{% endif %} rounded-lg p-2 hover:bg-white/10 transition">
         <div class="w-9 h-9 rounded-full bg-[#8491D3] flex items-center justify-center font-medium text-sm">{{ initials }}</div>
         <div class="text-left">
