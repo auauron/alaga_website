@@ -204,6 +204,11 @@ def home():
 def start():
     return render_template('start.html')
 
+# Initialize the database if it doesn't exist
+@app.before_first_request
+def create_tables():
+    db.create_all()
+    
 # route for the login page
 @app.route('/login', methods=['GET', 'POST'])
 def login():

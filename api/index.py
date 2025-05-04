@@ -1,15 +1,21 @@
-from flask import Flask
+from flask import Flask, render_template, url_for, redirect, request, session, jsonify
+import sys
+import os
 
-app = Flask(__name__)
+# Add the parent directory to sys.path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-@app.route('/')
-def home():
-    return "Hello from Flask on Vercel!"
+# Import your Flask app
+from app import app as flask_app
 
-@app.route('/about')
-def about():
-    return "About page"
+# This is the Vercel serverless function entry point
+@flask_app.route('/', defaults={'path': ''})
+@flask_app.route('/<path:path>')
+def catch_all(path):
+    if path == "":
+        # Redirect to start page when the root URL is accessed
+        return redirect(url_for('start'))
+    return flask_app.dispatch_request()
 
-# This is the handler Vercel will call
-def handler(request):
-    return app(request)
+# Export the Flask app as "app" for Vercel
+app = flask_app
