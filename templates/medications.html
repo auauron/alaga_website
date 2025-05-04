@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -31,22 +32,26 @@
       <!-- Sidebar -->
       {% include 'includes/sidebar.html' %}
       
-      <!-- HEADER -->
+      <!-- Not really the super main, but main Content -->
       <div class="flex-1 flex flex-col overflow-hidden">
         {% include 'includes/header.html' %}
-
+        
         <!-- main MAIN content -->
         <main class="flex-1 overflow-auto p-6" id="main-content">
-          <div class="mb-6">
-            <div class="mb-2"> 
-              <h2 class="text-4xl font-bold text-[#596BC7]">Medications</h2>
-              {% if active_profile %}
-                <p class="text-gray-600 text-sm">&nbsp;Ensure {{ active_profile.care_recipient }} takes their meds on time!</p>
-              {% else %}
-                <p class="text-gray-600 text-sm">&nbsp;Ensure your loved one takes their meds on time!</p>
-              {% endif %}
+            <!-- Care Summary -->
+            <div class="mb-6">
+              <div class="mb-2"> 
+                <h2 class="text-4xl font-bold text-[#596BC7]">Medications</h2>
+                {% if active_profile %}
+                <p class="text-gray-600 text-sm">Ensure {{ active_profile.care_recipient }} takes their meds on time!</p>
+                {% else %}
+                <p class="text-gray-600 text-sm">Select a care profile to manage medications</p>
+                {% endif %}
+              </div>
             </div>
-            <div class="bg-gradient-to-r from-pink-400 to-purple-500 rounded-lg p-4 text-white flex items-center justify-between">
+          
+            <!-- Today's Date -->
+            <div class="bg-gradient-to-r from-pink-400 to-purple-500 rounded-lg shadow-sm p-4 text-white flex items-center justify-between mb-4">
               <div class="flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
                   <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
@@ -57,7 +62,6 @@
                 <span id="current-date">Today's date: </span>
               </div>
             </div>
-          </div>
           
             <!-- Buttons: Edit and See History -->
             <div class="flex justify-end space-x-3 mb-4">
@@ -291,8 +295,10 @@
           <button type="button" id="closePremiumModal" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
             Maybe Later
           </button>
-          <a href="/upgrade_premium" class="px-4 py-2 bg-[#BC6FB7] text-white rounded hover:bg-[#E57DDE] inline-block">
-            Upgrade
+          <a href="{{ url_for('upgrade_premium') }}">
+            <button type="button" id="upgradePremiumBtn" class="px-4 py-2 bg-[#BC6FB7] text-white rounded hover:bg-[#E57DDE]">
+              Upgrade Now
+            </button>
           </a>
         </div>
       </div>
