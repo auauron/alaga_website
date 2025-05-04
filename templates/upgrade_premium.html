@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon"/>
     {% include 'includes/sidebar_styles.html' %}
     <script>
 
@@ -84,12 +85,16 @@
           <div class="mb-6">
             <div class="mb-2"> 
               <h2 class="text-4xl font-bold text-[#596BC7]">Subscription Plans</h2>
-              <p class="text-gray-600 text-sm">&nbsp;Choose the plan that's right for you</p>
+              <p class="text-gray-600 text-sm">&nbsp;Choose the plan that's right for your care.</p>
             </div>
             <div class="bg-gradient-to-r from-pink-400 to-purple-500 rounded-lg p-4 text-white flex items-center justify-between">
               <div class="flex items-center">
                 <i class="fas fa-crown mr-2"></i>
-                <span>Upgrade today for enhanced features and better care management</span>
+                <span>
+                    <strong>Alaga — Even Better</strong> &nbsp; &nbsp;
+                    <span class="block sm:inline">Upgrade today for enhanced features and better care management.</span>
+                  </span>
+                  
               </div>
             </div>
           </div>  
@@ -215,7 +220,7 @@
             </div>
           </div>
 
-            <!-- Features Included
+            <!-- Features Included-->
             <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
                 <div class="bg-[#8491D3] px-4 py-3">
                 <h2 class="text-lg font-bold text-white">All Plans Include</h2>
@@ -227,7 +232,7 @@
                 </div>
                 <div class="flex items-center">
                     <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                    <span>Medication Reminders</span>
+                    <span>To Do & Medication Reminders</span>
                 </div>
                 <div class="flex items-center">
                     <i class="fas fa-check-circle text-green-500 mr-2"></i>
@@ -238,7 +243,7 @@
                     <span>Care Profile</span>
                 </div>
                 </div>
-            </div> -->
+            </div> 
   
     
   
