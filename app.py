@@ -197,7 +197,7 @@ def about_us():
 #app route for home
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('start.html')
 
 # route for the start page
 @app.route('/start', methods=['GET', 'POST'])
