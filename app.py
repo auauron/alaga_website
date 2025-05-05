@@ -7,8 +7,9 @@ from wtforms.validators import InputRequired, Length, ValidationError
 import os
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
-from urllib.parse import urlencode, quote as url_quote
 import traceback
+# from werkzeug.urls import url_encode, quote as url_quote
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.root_path, 'database.db')
