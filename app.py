@@ -1,21 +1,32 @@
 from flask import Flask, render_template, url_for, redirect, request, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import event
 from flask_login import UserMixin, login_user, login_required, logout_user, current_user, LoginManager
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
+from flask_migrate import Migrate
 from wtforms.validators import InputRequired, Length, ValidationError
 import os
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
 import traceback
-# from werkzeug.urls import url_encode, quote as url_quote
-
+from werkzeug.utils import secure_filename
+from PIL import Image, ImageDraw
+import secrets
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.root_path, 'database.db')
 app.config['SECRET_KEY'] = 'ubedelechesecretkey'
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static/uploads/profile_pics')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+# Create upload folder if it doesn't exist
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+migrate = Migrate(app, db)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -25,12 +36,35 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def create_default_profile_pic():
+    default_pic_path = os.path.join(app.config['UPLOAD_FOLDER'], 'default.jpg')
+    
+    # Only create if it doesn't exist
+    if not os.path.exists(default_pic_path):
+        # Create a blank image with a purple background (to match your theme)
+        img = Image.new('RGB', (200, 200), color=(188, 111, 183))  # #BC6FB7
+        d = ImageDraw.Draw(img)
+        
+        # Draw a simple avatar placeholder
+        d.ellipse((50, 50, 150, 150), fill=(255, 255, 255))
+        d.ellipse((85, 85, 115, 115), fill=(188, 111, 183))
+        d.arc((70, 120, 130, 160), start=0, end=180, fill=(188, 111, 183), width=5)
+        
+        # Save the image
+        img.save(default_pic_path)
+        app.logger.info("Default profile picture created")
+
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MODELS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     fullname = db.Column(db.String(20), nullable=False)
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
+    profile_pic = db.Column(db.String(100), nullable=False, default='default.jpg')
 
     # User medications
     medications = db.relationship('Medication', backref='user_profile', lazy=True, cascade="all, delete-orphan")
@@ -270,7 +304,6 @@ def upgrade_premium():
 @app.route('/view_profile', methods=['GET', 'POST'])
 @login_required
 def view_profile():
-
     profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
 
     if request.method == 'POST':
@@ -288,12 +321,80 @@ def view_profile():
             current_user.password = hashed_password
         
         db.session.commit()
+        flash('Profile updated successfully', 'success')
         return redirect(url_for('view_profile'))
 
     fullname = current_user.fullname
     username = current_user.username
     initials = get_initials(fullname)
     return render_template('view_profile.html', fullname=fullname, username=username, initials=initials, profiles=profiles)
+
+@app.route('/upload_profile_pic', methods=['POST'])
+@login_required
+def upload_profile_pic():
+    if 'profile_pic' not in request.files:
+        flash('No file part', 'error')
+        return redirect(url_for('view_profile'))
+    
+    file = request.files['profile_pic']
+    
+    if file.filename == '':
+        flash('No selected file', 'error')
+        return redirect(url_for('view_profile'))
+    
+    if file and allowed_file(file.filename):
+        # Create a unique filename
+        filename = secure_filename(file.filename)
+        ext = filename.rsplit('.', 1)[1].lower()
+        new_filename = f"user_{current_user.id}_{secrets.token_hex(8)}.{ext}"
+        
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], new_filename)
+        
+        # Save and resize the image
+        img = Image.open(file)
+        
+        # Maintain aspect ratio but ensure it's not too large
+        max_size = (500, 500)
+        img.thumbnail(max_size)
+        
+        # Create a square image by cropping from center
+        width, height = img.size
+        if width != height:
+            # Determine the shorter side
+            min_side = min(width, height)
+            # Calculate cropping points
+            left = (width - min_side) // 2
+            top = (height - min_side) // 2
+            right = left + min_side
+            bottom = top + min_side
+            # Crop the image
+            img = img.crop((left, top, right, bottom))
+        
+        # Resize to final size
+        img = img.resize((200, 200))
+        
+        # Save the image
+        img.save(filepath)
+        
+        # Delete old profile pic if it's not the default
+        if current_user.profile_pic != 'default.jpg':
+            try:
+                old_pic_path = os.path.join(app.config['UPLOAD_FOLDER'], current_user.profile_pic)
+                if os.path.exists(old_pic_path):
+                    os.remove(old_pic_path)
+            except Exception as e:
+                app.logger.error(f"Error deleting old profile pic: {str(e)}")
+        
+        # Update user profile pic in database
+        current_user.profile_pic = new_filename
+        db.session.commit()
+        
+        flash('Profile picture updated successfully', 'success')
+        return redirect(url_for('view_profile'))
+    
+    flash('Invalid file type. Allowed types: png, jpg, jpeg, gif', 'error')
+    return redirect(url_for('view_profile'))
+
 
 # route for care profiles page
 @app.route('/care_profiles', methods=['GET', 'POST'])
@@ -439,6 +540,7 @@ def dashboard():
     
     fullname = current_user.fullname
     initials = get_initials(fullname)
+    image_file = url_for('static', filename='uploads/profile_pics/' + current_user.profile_pic)
     
     return render_template('dashboard.html', 
                           fullname=fullname, 
@@ -448,7 +550,8 @@ def dashboard():
                           todos=todos,
                           medications=today_medications,
                           health_records=combined_records,
-                          today=today)
+                          today=today,
+                          image_file=image_file)
 
 @app.route('/todo', methods=['GET', 'POST'])
 @login_required
@@ -464,7 +567,8 @@ def todo():
     
     fullname = current_user.fullname
     initials = get_initials(fullname)
-    return render_template('todo.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile)
+    image_file = url_for('static', filename='uploads/profile_pics/' + current_user.profile_pic)
+    return render_template('todo.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile, image_file=image_file)
 
 #route for medications page
 @app.route('/medications', methods=['GET'])
@@ -482,7 +586,8 @@ def medications():
     
     fullname = current_user.fullname
     initials = get_initials(fullname)
-    return render_template('medications.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile)
+    image_file = url_for('static', filename='uploads/profile_pics/' + current_user.profile_pic)
+    return render_template('medications.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile, image_file=image_file)
 
 #route for health records page
 @app.route('/health_records', methods=['GET', 'POST'])
@@ -500,7 +605,8 @@ def health_records():
     
     fullname = current_user.fullname
     initials = get_initials(fullname)
-    return render_template('health_records.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile)
+    image_file = url_for('static', filename='uploads/profile_pics/' + current_user.profile_pic)
+    return render_template('health_records.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile, image_file=image_file)
 
 @app.route('/switch_profile/<int:profile_id>', methods=['POST'])
 @login_required
@@ -1090,7 +1196,14 @@ def get_initials(name):
     initials = ''.join([p[0].upper() for p in parts if p])
     return initials
 
+# Add this at the bottom of your file, before if __name__ == '__main__'
+def init_app():
+    """Initialize application resources"""
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    create_default_profile_pic()
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        init_app()
     app.run(debug=True)

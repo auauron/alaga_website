@@ -36,13 +36,48 @@
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 sm:p-8">
         <h2 class="text-4xl font-bold text-[#596BC7]">Edit Your Profile</h2>
 
-        <form method="POST" action="{{ url_for('view_profile') }}" class="space-y-6">
-          <div class="flex justify-center">
-            <div class="w-24 h-24 rounded-full bg-purple-100 dark:bg-purple-300 flex items-center justify-center mb-4">
-              <div class="text-2xl font-semibold text-purple-600 dark:text-purple-800">{{ initials }}</div>
+        <!-- Display flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="mt-4 p-3 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- Profile Picture Section -->
+        <div class="mt-6 flex flex-col items-center">
+          <div class="relative group">
+            {% if current_user.profile_pic and current_user.profile_pic != 'default.jpg' %}
+              <!-- Display actual profile picture if it exists and is not the default -->
+              <img src="{{ url_for('static', filename='uploads/profile_pics/' + current_user.profile_pic) }}" 
+                   alt="Profile Picture" 
+                   class="w-32 h-32 rounded-full object-cover border-4 border-[#BC6FB7]">
+            {% else %}
+              <!-- Display initials if no profile picture -->
+              <div class="w-32 h-32 rounded-full bg-[#BC6FB7] flex items-center justify-center border-4 border-[#BC6FB7]">
+                <span class="text-white text-4xl font-semibold">{{ initials }}</span>
+              </div>
+            {% endif %}
+            
+            <div class="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                 onclick="document.getElementById('profile_pic_input').click()">
+              <span class="text-white text-sm">Change Picture</span>
             </div>
           </div>
+          
+          <form action="{{ url_for('upload_profile_pic') }}" method="POST" enctype="multipart/form-data" class="mt-3">
+            <input type="file" id="profile_pic_input" name="profile_pic" class="hidden" onchange="this.form.submit()">
+            <button type="button" onclick="document.getElementById('profile_pic_input').click()" 
+                    class="text-sm text-[#BC6FB7] hover:text-[#E57DDE] font-medium">
+              Upload New Photo
+            </button>
+          </form>
+        </div>
 
+        <form method="POST" action="{{ url_for('view_profile') }}" class="space-y-6 mt-6">
           <div>
             <label for="name" class="block text-sm font-bold text-[#DB6774] mb-2">Name (First name, Last name)</label>
             <input type="text" id="name" name="name" value="{{ fullname }}" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
