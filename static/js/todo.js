@@ -395,8 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="flex items-center">
           <input type="checkbox" id="task-${task.id}" 
             class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full 
-            checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative"
-            ${task.completed ? "checked" : ""}>
+            checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative">
           <label for="task-${task.id}" class="ml-3 text-gray-800">
             <span class="task-text">${task.text}</span>
             <span class="text-xs text-gray-500 ml-2">(${formatShortDate(new Date(task.date))})</span>
@@ -408,8 +407,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="flex items-center">
           <input type="checkbox" id="task-${task.id}" 
             class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full 
-            checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative"
-            ${task.completed ? "checked" : ""}>
+            checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative">
           <label for="task-${task.id}" class="ml-3 text-gray-800">
             <span class="task-text">${task.text}</span>
           </label>
@@ -421,6 +419,9 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       const checkbox = div.querySelector('input[type="checkbox"]')
       if (checkbox) {
+        // Explicitly set the checked property based on task.completed
+        checkbox.checked = task.completed
+
         checkbox.addEventListener("change", () => {
           const taskId = div.dataset.id
           const allTasks = [...todayTasks, ...tomorrowTasks, ...upcomingTasks]
