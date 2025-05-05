@@ -29,17 +29,17 @@
                 <label class="form-label block text-sm font-semibold text-[#DB6774] mb-2">Username</label>
                 {{ form.username(class="form-input w-full border border-gray-300 rounded-full px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-300", placeholder="Enter username") }}
             </div>
-
+        
             <div class="text-left">
                 <label class="form-label block text-sm font-semibold text-[#DB6774] mb-2">Password</label>
                 {{ form.password(class="form-input w-full border border-gray-300 rounded-full px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-300", placeholder="Enter password") }}
             </div>
-
-            {{ form.submit(class="w-full bg-indigo-400 hover:bg-indigo-500 text-white font-semibold py-3 rounded-full transition", value="Log In") }}
+                <!--buttons-->
+            {{ form.submit(class="w-full bg-[#596BC7] hover:bg-indigo-900 text-white font-semibold py-3 rounded-full transition", value="Log In") }}
         </form>
 
         <p class="text-gray-500 text-sm mt-6">Don't have an account?</p>
-        <a href="{{ url_for('register') }}" class="block mt-2 text-indigo-400 hover:underline font-medium">Create Account</a>
+        <a href="{{ url_for('register') }}" class="block mt-2 text-[#596BC7] hover:underline font-medium">Create Account</a>
         <a href="{{ url_for('about_us') }}" class="text-[#BC6FB7] text-xs hover:underline font-semibold mt-3">About Us</a>
 
     </div>

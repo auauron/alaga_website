@@ -33,8 +33,8 @@
 
         <!-- Logo and Title -->
         <img src="{{ url_for('static', filename='images/alaga_logo_trans.png') }}" alt="Alaga Logo" class="mx-auto h-24 mb-4">
-        <h1 class="text-3xl font-bold text-[#c77dbd]">Alaga</h1>
-        <p class="text-gray-600 text-sm mt-1">"Your Best Medi-guide"</p>
+        <h1 class="text-5xl font-bold text-[#c77dbd] mb-2">Alaga</h1>
+        <p class="text-xl font-semibold text-[#596BC7] mb-2 mt-2">Your Care. Your Way.</p>
 
         <!-- Tagline -->
         <p class="text-gray-600 text-sm mt-6 mb-8">
@@ -43,10 +43,10 @@
 
         <!-- Buttons -->
         <div class="space-y-4">
-            <a href="{{ url_for('register') }}" class="w-full block bg-indigo-400 hover:bg-indigo-500 text-white font-semibold py-3 rounded-full transition">
+            <a href="{{ url_for('register') }}" class="w-full block bg-[#596BC7] hover:bg-indigo-900 text-white font-semibold py-3 rounded-full transition">
                 Get Started
             </a>
-            <a href="{{ url_for('login') }}" class="w-full block border border-indigo-400 text-indigo-400 hover:bg-indigo-50 font-semibold py-3 rounded-full transition">
+            <a href="{{ url_for('login') }}" class="w-full block border border-[#596BC7] text-[#596BC7] hover:bg-indigo-200 font-semibold py-3 rounded-full transition">
                 Log-In
             </a>
         </div>
@@ -56,6 +56,8 @@
             By clicking continue, you agree to our<br>
             Terms of Service and Privacy Policy.
         </p>
+        <a href="{{ url_for('about_us') }}" class="text-[#BC6FB7] text-xs hover:underline font-semibold mt-3">About Us</a>
+
     </div>
 </body>
 </html>
