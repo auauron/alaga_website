@@ -50,8 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const biometricType = getElement("biometricType")
   const editHealthRecordsModal = getElement("editHealthRecordsModal")
   const healthRecordSelect = getElement("healthRecordSelect")
-  const editHealthRecordForm = getElement("editHealthRecordForm")
-  const editFormFields = getElement("editFormFields")
+  const editHealthRecordForm = getElement("editFormFields")
   const noRecordSelected = getElement("noRecordSelected")
   const cancelEditHealthRecordBtn = getElement("cancelEditHealthRecord")
   const deleteHealthRecordBtn = getElement("deleteHealthRecordBtn")
@@ -230,17 +229,17 @@ document.addEventListener("DOMContentLoaded", () => {
       otherTypeDiv.id = "otherTypeInput"
       otherTypeDiv.className = "mb-4 hidden"
       otherTypeDiv.innerHTML = `
-    <label for="otherType" class="block text-gray-700 text-sm font-bold mb-2">
-      Specify Type:
-    </label>
-    <input
-      type="text"
-      id="otherType"
-      name="otherType"
-      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-      placeholder="Enter the specific type"
-    />
-  `
+  <label for="otherType" class="block text-gray-700 text-sm font-bold mb-2">
+    Specify Type:
+  </label>
+  <input
+    type="text"
+    id="otherType"
+    name="otherType"
+    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+    placeholder="Enter the specific type"
+  />
+`
       // Insert after the biometrics options
       if (biometricsOptions) {
         biometricsOptions.parentNode.insertBefore(otherTypeDiv, biometricsOptions.nextSibling)
@@ -510,20 +509,20 @@ document.addEventListener("DOMContentLoaded", () => {
   function populateEditForm(record) {
     log("Populating edit form with record:", record)
 
-    if (!editFormFields) {
+    if (!editHealthRecordForm) {
       log("Error: Edit form fields container not found")
       return
     }
 
     // Clear existing fields
-    editFormFields.innerHTML = ""
+    editHealthRecordForm.innerHTML = ""
 
     // Add common fields
     const dateField = createFormField("date", "Date", record.date, "date")
     const timeField = createFormField("time", "Time", record.time, "time")
 
-    editFormFields.appendChild(dateField)
-    editFormFields.appendChild(timeField)
+    editHealthRecordForm.appendChild(dateField)
+    editHealthRecordForm.appendChild(timeField)
 
     // Add category-specific fields
     if (record.category === "vital-signs" || record.category === "biometrics") {
@@ -535,14 +534,14 @@ document.addEventListener("DOMContentLoaded", () => {
       typeField.type = "hidden"
       typeField.name = "type"
       typeField.value = record.type
-      editFormFields.appendChild(typeField)
+      editHealthRecordForm.appendChild(typeField)
 
       // Add category as hidden field
       const categoryField = document.createElement("input")
       categoryField.type = "hidden"
       categoryField.name = "category"
       categoryField.value = record.category
-      editFormFields.appendChild(categoryField)
+      editHealthRecordForm.appendChild(categoryField)
 
       if (record.type === "blood-pressure") {
         // Add blood pressure fields
@@ -594,11 +593,11 @@ document.addEventListener("DOMContentLoaded", () => {
         bpContainer.appendChild(bpLabel)
         bpContainer.appendChild(bpInputsContainer)
 
-        editFormFields.appendChild(bpContainer)
+        editHealthRecordForm.appendChild(bpContainer)
       } else {
         // Add value field
         const valueField = createFormField("value", typeLabelCapitalized, record.value, "text")
-        editFormFields.appendChild(valueField)
+        editHealthRecordForm.appendChild(valueField)
       }
     } else if (record.category === "medical-notes") {
       // Add category as hidden field
@@ -606,11 +605,11 @@ document.addEventListener("DOMContentLoaded", () => {
       categoryField.type = "hidden"
       categoryField.name = "category"
       categoryField.value = record.category
-      editFormFields.appendChild(categoryField)
+      editHealthRecordForm.appendChild(categoryField)
 
       // Add subject field
       const subjectField = createFormField("subject", "Subject", record.subject, "text")
-      editFormFields.appendChild(subjectField)
+      editHealthRecordForm.appendChild(subjectField)
 
       // Add body field
       const bodyContainer = document.createElement("div")
@@ -629,7 +628,7 @@ document.addEventListener("DOMContentLoaded", () => {
       bodyContainer.appendChild(bodyLabel)
       bodyContainer.appendChild(bodyTextarea)
 
-      editFormFields.appendChild(bodyContainer)
+      editHealthRecordForm.appendChild(bodyContainer)
     }
   }
 
@@ -660,13 +659,28 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch("/api/health-records")
       .then((response) => {
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`)
+          if (response.status === 400) {
+            // No active profile selected, this is expected
+            return response.json().then((data) => {
+              showNoActiveProfileError(data.error || "No active profile selected. Data will be erased when refreshed.")
+              return []
+            })
+          }
+          throw new Error(`Failed to load health records`)
         }
         return response.json()
       })
       .then((data) => {
         log("Received health records from server:", data)
-        healthRecords = data
+        if (data.error) {
+          // Show error message for no active profile
+          showNoActiveProfileError(data.error)
+          healthRecords = []
+        } else {
+          // Hide error message if it exists
+          hideNoActiveProfileError()
+          healthRecords = data.healthRecords || data
+        }
         renderHealthRecords()
         renderHealthRecordsHistory()
       })
@@ -676,6 +690,60 @@ document.addEventListener("DOMContentLoaded", () => {
         renderHealthRecords()
         renderHealthRecordsHistory()
       })
+  }
+
+  // Show error message for no active profile
+  function showNoActiveProfileError(errorMessage) {
+    log("Showing no active profile error:", errorMessage)
+
+    // Check if error message already exists
+    if (document.getElementById("no-active-profile-error")) {
+      return
+    }
+
+    // Create error message element
+    const errorDiv = document.createElement("div")
+    errorDiv.id = "no-active-profile-error"
+    errorDiv.className = "p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg"
+    errorDiv.innerHTML = `
+  <div class="flex items-center">
+    <i class="fa-solid fa-circle-exclamation mr-2"></i>
+    <span>${errorMessage}</span>
+  </div>
+`
+
+    // Insert at the top of the main content
+    const mainContent = getElement("main-content")
+    if (mainContent) {
+      mainContent.insertBefore(errorDiv, mainContent.firstChild)
+    }
+
+    // Also add to history page
+    const historyPage = getElement("history-page")
+    if (historyPage) {
+      const historyErrorDiv = errorDiv.cloneNode(true)
+      historyPage.insertBefore(historyErrorDiv, historyPage.firstChild)
+    }
+  }
+
+  // Hide error message for no active profile
+  function hideNoActiveProfileError() {
+    log("Hiding no active profile error")
+
+    // Remove error message from main content
+    const mainErrorDiv = getElement("no-active-profile-error")
+    if (mainErrorDiv) {
+      mainErrorDiv.remove()
+    }
+
+    // Remove error message from history page
+    const historyPage = getElement("history-page")
+    if (historyPage) {
+      const historyErrorDiv = historyPage.querySelector("#no-active-profile-error")
+      if (historyErrorDiv) {
+        historyErrorDiv.remove()
+      }
+    }
   }
 
   // Render health records
@@ -771,117 +839,117 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (record.type === "blood-pressure") {
         content = `
-                  <div class="flex items-center flex-grow">
-                      <div class="mr-3">${icon}</div>
-                      <div>
-                          <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                          <p class="text-gray-500 text-sm">${record.systolic}/${record.diastolic} mmHg</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Last taken:</p>
-                      <p class="text-gray-500 text-xs">${lastTaken}</p>
-                  </div>
-              `
+                <div class="flex items-center flex-grow">
+                    <div class="mr-3">${icon}</div>
+                    <div>
+                        <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                        <p class="text-gray-500 text-sm">${record.systolic}/${record.diastolic} mmHg</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Last taken:</p>
+                    <p class="text-gray-500 text-xs">${lastTaken}</p>
+                </div>
+            `
       } else if (record.type === "respiratory-rate") {
         content = `
-                  <div class="flex items-center flex-grow">
-                      <div class="mr-3">${icon}</div>
-                      <div>
-                          <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                          <p class="text-gray-500 text-sm">${record.value} breathes per min</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Last taken:</p>
-                      <p class="text-gray-500 text-xs">${lastTaken}</p>
-                  </div>
-              `
+                <div class="flex items-center flex-grow">
+                    <div class="mr-3">${icon}</div>
+                    <div>
+                        <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                        <p class="text-gray-500 text-sm">${record.value} breathes per min</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Last taken:</p>
+                    <p class="text-gray-500 text-xs">${lastTaken}</p>
+                </div>
+            `
       } else if (record.type === "oxygen-saturation") {
         content = `
-                  <div class="flex items-center flex-grow">
-                      <div class="mr-3">${icon}</div>
-                      <div>
-                          <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                          <p class="text-gray-500 text-sm">${record.value} SpO2 %</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Last taken:</p>
-                      <p class="text-gray-500 text-xs">${lastTaken}</p>
-                  </div>
-              `
+                <div class="flex items-center flex-grow">
+                    <div class="mr-3">${icon}</div>
+                    <div>
+                        <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                        <p class="text-gray-500 text-sm">${record.value} SpO2 %</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Last taken:</p>
+                    <p class="text-gray-500 text-xs">${lastTaken}</p>
+                </div>
+            `
       } else if (record.type === "weight") {
         content = `
-                  <div class="flex items-center flex-grow">
-                      <div class="mr-3">${icon}</div>
-                      <div>
-                          <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                          <p class="text-gray-500 text-sm">${record.value} kg</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Last taken:</p>
-                      <p class="text-gray-500 text-xs">${lastTaken}</p>
-                  </div>
-              `
+                <div class="flex items-center flex-grow">
+                    <div class="mr-3">${icon}</div>
+                    <div>
+                        <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                        <p class="text-gray-500 text-sm">${record.value} kg</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Last taken:</p>
+                    <p class="text-gray-500 text-xs">${lastTaken}</p>
+                </div>
+            `
       } else if (record.type === "body-temperature") {
         content = `
-                  <div class="flex items-center flex-grow">
-                      <div class="mr-3">${icon}</div>
-                      <div>
-                          <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                          <p class="text-gray-500 text-sm">${record.value} °C</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Last taken:</p>
-                      <p class="text-gray-500 text-xs">${lastTaken}</p>
-                  </div>
-              `
+                <div class="flex items-center flex-grow">
+                    <div class="mr-3">${icon}</div>
+                    <div>
+                        <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                        <p class="text-gray-500 text-sm">${record.value} °C</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Last taken:</p>
+                    <p class="text-gray-500 text-xs">${lastTaken}</p>
+                </div>
+            `
       } else if (record.type === "heart-rate") {
         content = `
-                  <div class="flex items-center flex-grow">
-                      <div class="mr-3">${icon}</div>
-                      <div>
-                          <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                          <p class="text-gray-500 text-sm">${record.value} bpm</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Last taken:</p>
-                      <p class="text-gray-500 text-xs">${lastTaken}</p>
-                  </div>
-              `
+                <div class="flex items-center flex-grow">
+                    <div class="mr-3">${icon}</div>
+                    <div>
+                        <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                        <p class="text-gray-500 text-sm">${record.value} bpm</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Last taken:</p>
+                    <p class="text-gray-500 text-xs">${lastTaken}</p>
+                </div>
+            `
       } else if (record.type === "other-vital-sign") {
         const typeName = record.customType ? record.customType : "Other vital sign"
         content = `
-            <div class="flex items-center flex-grow">
-                <div class="mr-3">${icon}</div>
-                <div>
-                    <h3 class="font-medium">${typeName}</h3>
-                    <p class="text-gray-500 text-sm">${record.value}</p>
-                </div>
-            </div>
-            <div class="text-right">
-                <p class="text-gray-400 text-xs">Last taken:</p>
-                <p class="text-gray-500 text-xs">${lastTaken}</p>
-            </div>
-        `
+          <div class="flex items-center flex-grow">
+              <div class="mr-3">${icon}</div>
+              <div>
+                  <h3 class="font-medium">${typeName}</h3>
+                  <p class="text-gray-500 text-sm">${record.value}</p>
+              </div>
+          </div>
+          <div class="text-right">
+              <p class="text-gray-400 text-xs">Last taken:</p>
+              <p class="text-gray-500 text-xs">${lastTaken}</p>
+          </div>
+      `
       } else {
         content = `
-                  <div class="flex items-center flex-grow">
-                      <div class="mr-3">${icon}</div>
-                      <div>
-                          <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                          <p class="text-gray-500 text-sm">${record.value}</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Last taken:</p>
-                      <p class="text-gray-500 text-xs">${lastTaken}</p>
-                  </div>
-              `
+                <div class="flex items-center flex-grow">
+                    <div class="mr-3">${icon}</div>
+                    <div>
+                        <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                        <p class="text-gray-500 text-sm">${record.value}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Last taken:</p>
+                    <p class="text-gray-500 text-xs">${lastTaken}</p>
+                </div>
+            `
       }
     } else if (category === "biometrics") {
       const typeLabel = record.type.replace(/-/g, " ")
@@ -889,82 +957,113 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (record.type === "blood-glucose") {
         content = `
-                  <div class="flex items-center flex-grow">
-                      <div class="mr-3">${icon}</div>
-                      <div>
-                          <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                          <p class="text-gray-500 text-sm">${record.value} mg/dL</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Last taken:</p>
-                      <p class="text-gray-500 text-xs">${lastTaken}</p>
-                  </div>
-              `
+                <div class="flex items-center flex-grow">
+                    <div class="mr-3">${icon}</div>
+                    <div>
+                        <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                        <p class="text-gray-500 text-sm">${record.value} mg/dL</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Last taken:</p>
+                    <p class="text-gray-500 text-xs">${lastTaken}</p>
+                </div>
+            `
       } else if (record.type === "cholesterol") {
         content = `
-                  <div class="flex items-center flex-grow">
-                      <div class="mr-3">${icon}</div>
-                      <div>
-                          <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                          <p class="text-gray-500 text-sm">${record.value} mg/dL</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Last taken:</p>
-                      <p class="text-gray-500 text-xs">${lastTaken}</p>
-                  </div>
-              `
+                <div class="flex items-center flex-grow">
+                    <div class="mr-3">${icon}</div>
+                    <div>
+                        <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                        <p class="text-gray-500 text-sm">${record.value} mg/dL</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Last taken:</p>
+                    <p class="text-gray-500 text-xs">${lastTaken}</p>
+                </div>
+            `
       } else if (record.type === "hemoglobin-a1c") {
         content = `
-                  <div class="flex items-center flex-grow">
-                      <div class="mr-3">${icon}</div>
-                      <div>
-                          <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                          <p class="text-gray-500 text-sm">${record.value} %</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Last taken:</p>
-                      <p class="text-gray-500 text-xs">${lastTaken}</p>
-                  </div>
-              `
+                <div class="flex items-center flex-grow">
+                    <div class="mr-3">${icon}</div>
+                    <div>
+                        <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                        <p class="text-gray-500 text-sm">${record.value} %</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Last taken:</p>
+                    <p class="text-gray-500 text-xs">${lastTaken}</p>
+                </div>
+            `
       } else if (record.type === "creatinine") {
         content = `
-                  <div class="flex items-center flex-grow">
-                      <div class="mr-3">${icon}</div>
-                      <div>
-                          <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                          <p class="text-gray-500 text-sm">${record.value} mg/dL</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Last taken:</p>
-                      <p class="text-gray-500 text-xs">${lastTaken}</p>
-                  </div>
-              `
+                <div class="flex items-center flex-grow">
+                    <div class="mr-3">${icon}</div>
+                    <div>
+                        <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                        <p class="text-gray-500 text-sm">${record.value} mg/dL</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Last taken:</p>
+                    <p class="text-gray-500 text-xs">${lastTaken}</p>
+                </div>
+            `
       } else if (record.type === "liver-enzymes") {
         content = `
-                  <div class="flex items-center flex-grow">
-                      <div class="mr-3">${icon}</div>
-                      <div>
-                          <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                          <p class="text-gray-500 text-sm">${record.value} U/L</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Last taken:</p>
-                      <p class="text-gray-500 text-xs">${lastTaken}</p>
-                  </div>
-              `
+                <div class="flex items-center flex-grow">
+                    <div class="mr-3">${icon}</div>
+                    <div>
+                        <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                        <p class="text-gray-500 text-sm">${record.value} U/L</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Last taken:</p>
+                    <p class="text-gray-500 text-xs">${lastTaken}</p>
+                </div>
+            `
       } else if (record.type === "other-biometric") {
         const typeName = record.customType ? record.customType : "Other biometric"
         content = `
+          <div class="flex items-center flex-grow">
+              <div class="mr-3">${icon}</div>
+              <div>
+                  <h3 class="font-medium">${typeName}</h3>
+                  <p class="text-gray-500 text-sm">${record.value}</p>
+              </div>
+          </div>
+          <div class="text-right">
+              <p class="text-gray-400 text-xs">Last taken:</p>
+              <p class="text-gray-500 text-xs">${lastTaken}</p>
+          </div>
+      `
+      } else {
+        content = `
+                <div class="flex items-center flex-grow">
+                    <div class="mr-3">${icon}</div>
+                    <div>
+                        <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                        <p class="text-gray-500 text-sm">${record.value}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Last taken:</p>
+                    <p class="text-gray-500 text-xs">${lastTaken}</p>
+                </div>
+            `
+      }
+    } else if (category === "medical-notes") {
+      content = `
             <div class="flex items-center flex-grow">
-                <div class="mr-3">${icon}</div>
+                <div class="mr-3">
+                    ${icon}
+                </div>
                 <div>
-                    <h3 class="font-medium">${typeName}</h3>
-                    <p class="text-gray-500 text-sm">${record.value}</p>
+                    <h3 class="font-medium">${record.subject}</h3>
+                    <p class="text-gray-500 text-sm">${record.body ? (record.body.length > 50 ? record.body.substring(0, 50) + "..." : record.body) : ""}</p>
                 </div>
             </div>
             <div class="text-right">
@@ -972,37 +1071,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 <p class="text-gray-500 text-xs">${lastTaken}</p>
             </div>
         `
-      } else {
-        content = `
-                  <div class="flex items-center flex-grow">
-                      <div class="mr-3">${icon}</div>
-                      <div>
-                          <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                          <p class="text-gray-500 text-sm">${record.value}</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Last taken:</p>
-                      <p class="text-gray-500 text-xs">${lastTaken}</p>
-                  </div>
-              `
-      }
-    } else if (category === "medical-notes") {
-      content = `
-              <div class="flex items-center flex-grow">
-                  <div class="mr-3">
-                      ${icon}
-                  </div>
-                  <div>
-                      <h3 class="font-medium">${record.subject}</h3>
-                      <p class="text-gray-500 text-sm">${record.body ? (record.body.length > 50 ? record.body.substring(0, 50) + "..." : record.body) : ""}</p>
-                  </div>
-              </div>
-              <div class="text-right">
-                  <p class="text-gray-400 text-xs">Last taken:</p>
-                  <p class="text-gray-500 text-xs">${lastTaken}</p>
-              </div>
-          `
     }
 
     div.innerHTML = content
@@ -1114,23 +1182,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (record.type === "blood-pressure") {
         content = `
-                  <div class="flex justify-between items-start">
-                      <div class="flex items-start">
-                          <div class="mr-3 mt-1">
-                              ${icon}
-                          </div>
-                          <div>
-                              <span class="text-xs text-gray-400">${categoryLabel}</span>
-                              <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                              <p class="text-gray-500 text-sm">${record.systolic}/${record.diastolic} mmHg</p>
-                          </div>
-                      </div>
-                      <div class="text-right">
-                          <p class="text-gray-400 text-xs">Taken at:</p>
-                          <p class="text-gray-500 text-xs">${time}</p>
-                      </div>
-                  </div>
-              `
+                <div class="flex justify-between items-start">
+                    <div class="flex items-start">
+                        <div class="mr-3 mt-1">
+                            ${icon}
+                        </div>
+                        <div>
+                            <span class="text-xs text-gray-400">${categoryLabel}</span>
+                            <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                            <p class="text-gray-500 text-sm">${record.systolic}/${record.diastolic} mmHg</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-gray-400 text-xs">Taken at:</p>
+                        <p class="text-gray-500 text-xs">${time}</p>
+                    </div>
+                </div>
+            `
       } else {
         // Add units based on record type
 
@@ -1147,23 +1215,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         content = `
-                  <div class="flex justify-between items-start">
-                      <div class="flex items-start">
-                          <div class="mr-3 mt-1">
-                              ${icon}
-                          </div>
-                          <div>
-                              <span class="text-xs text-gray-400">${categoryLabel}</span>
-                              <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                              <p class="text-gray-500 text-sm">${valueWithUnit}</p>
-                          </div>
-                      </div>
-                      <div class="text-right">
-                          <p class="text-gray-400 text-xs">Taken at:</p>
-                          <p class="text-gray-500 text-xs">${time}</p>
-                      </div>
-                  </div>
-              `
+                <div class="flex justify-between items-start">
+                    <div class="flex items-start">
+                        <div class="mr-3 mt-1">
+                            ${icon}
+                        </div>
+                        <div>
+                            <span class="text-xs text-gray-400">${categoryLabel}</span>
+                            <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                            <p class="text-gray-500 text-sm">${valueWithUnit}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-gray-400 text-xs">Taken at:</p>
+                        <p class="text-gray-500 text-xs">${time}</p>
+                    </div>
+                </div>
+            `
       }
     } else if (record.category === "biometrics") {
       const typeLabel = record.type.replace(/-/g, " ")
@@ -1192,42 +1260,42 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       content = `
-              <div class="flex justify-between items-start">
-                  <div class="flex items-start">
-                      <div class="mr-3 mt-1">
-                          ${icon}
-                      </div>
-                      <div>
-                          <span class="text-xs text-gray-400">${categoryLabel}</span>
-                          <h3 class="font-medium">${typeLabelCapitalized}</h3>
-                          <p class="text-gray-500 text-sm">${valueWithUnit}</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Taken at:</p>
-                      <p class="text-gray-500 text-xs">${time}</p>
-                  </div>
-              </div>
-          `
+            <div class="flex justify-between items-start">
+                <div class="flex items-start">
+                    <div class="mr-3 mt-1">
+                        ${icon}
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-400">${categoryLabel}</span>
+                        <h3 class="font-medium">${typeLabelCapitalized}</h3>
+                        <p class="text-gray-500 text-sm">${valueWithUnit}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Taken at:</p>
+                    <p class="text-gray-500 text-xs">${time}</p>
+                </div>
+            </div>
+        `
     } else if (record.category === "medical-notes") {
       content = `
-              <div class="flex justify-between items-start">
-                  <div class="flex items-start">
-                      <div class="mr-3 mt-1">
-                          ${icon}
-                      </div>
-                      <div>
-                          <span class="text-xs text-gray-400">Medical Note</span>
-                          <h3 class="font-medium">${record.subject}</h3>
-                          <p class="text-gray-500 text-sm">${record.body || ""}</p>
-                      </div>
-                  </div>
-                  <div class="text-right">
-                      <p class="text-gray-400 text-xs">Taken at:</p>
-                      <p class="text-gray-500 text-xs">${time}</p>
-                  </div>
-              </div>
-          `
+            <div class="flex justify-between items-start">
+                <div class="flex items-start">
+                    <div class="mr-3 mt-1">
+                        ${icon}
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-400">Medical Note</span>
+                        <h3 class="font-medium">${record.subject}</h3>
+                        <p class="text-gray-500 text-sm">${record.body || ""}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-xs">Taken at:</p>
+                    <p class="text-gray-500 text-xs">${time}</p>
+                </div>
+            </div>
+        `
     }
 
     div.innerHTML = content
@@ -1252,6 +1320,27 @@ document.addEventListener("DOMContentLoaded", () => {
             // Premium limit reached
             showPremiumModal()
             throw new Error("Premium limit reached")
+          }
+          if (response.status === 400) {
+            // No active profile selected, show error but still add the record locally
+            return response.json().then((data) => {
+              showNoActiveProfileError(data.error || "No active profile selected. Data will be erased when refreshed.")
+
+              // Create a temporary record with a generated ID
+              const tempRecord = {
+                ...record,
+                id: Date.now(),
+              }
+
+              // Add to health records array
+              healthRecords.push(tempRecord)
+
+              // Re-render the health records
+              renderHealthRecords()
+              renderHealthRecordsHistory()
+
+              return { id: tempRecord.id }
+            })
           }
           return response.json().then((err) => {
             throw new Error(err.error || `HTTP error! Status: ${response.status}`)

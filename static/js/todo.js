@@ -392,27 +392,27 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create inner HTML based on section
     if (section === "upcoming") {
       div.innerHTML = `
-        <div class="flex items-center">
-          <input type="checkbox" id="task-${task.id}" 
-            class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full 
-            checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative">
-          <label for="task-${task.id}" class="ml-3 text-gray-800">
-            <span class="task-text">${task.text}</span>
-            <span class="text-xs text-gray-500 ml-2">(${formatShortDate(new Date(task.date))})</span>
-          </label>
-        </div>
-      `
+      <div class="flex items-center">
+        <input type="checkbox" id="task-${task.id}" 
+          class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full 
+          checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative">
+        <label for="task-${task.id}" class="ml-3 text-gray-800">
+          <span class="task-text">${task.text}</span>
+          <span class="text-xs text-gray-500 ml-2">(${formatShortDate(new Date(task.date))})</span>
+        </label>
+      </div>
+    `
     } else {
       div.innerHTML = `
-        <div class="flex items-center">
-          <input type="checkbox" id="task-${task.id}" 
-            class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full 
-            checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative">
-          <label for="task-${task.id}" class="ml-3 text-gray-800">
-            <span class="task-text">${task.text}</span>
-          </label>
-        </div>
-      `
+      <div class="flex items-center">
+        <input type="checkbox" id="task-${task.id}" 
+          class="w-6 h-6 appearance-none border-2 border-gray-300 rounded-full 
+          checked:bg-[#8491D3] checked:border-transparent focus:outline-none relative">
+        <label for="task-${task.id}" class="ml-3 text-gray-800">
+          <span class="task-text">${task.text}</span>
+        </label>
+      </div>
+    `
     }
 
     // Add event listener for checkbox
@@ -449,15 +449,32 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch("/api/todos")
       .then((response) => {
         if (!response.ok) {
+          if (response.status === 400) {
+            // No active profile selected, this is expected
+            return response.json().then((data) => {
+              showNoActiveProfileError(data.error || "No active profile selected. Data will be erased when refreshed.")
+              return { today: [], tomorrow: [], upcoming: [] }
+            })
+          }
           throw new Error(`HTTP error! Status: ${response.status}`)
         }
         return response.json()
       })
       .then((data) => {
         log("Received todos from server:", data)
-        todayTasks = data.today || []
-        tomorrowTasks = data.tomorrow || []
-        upcomingTasks = data.upcoming || []
+        if (data.error) {
+          // Show error message for no active profile
+          showNoActiveProfileError(data.error)
+          todayTasks = []
+          tomorrowTasks = []
+          upcomingTasks = []
+        } else {
+          // Hide error message if it exists
+          hideNoActiveProfileError()
+          todayTasks = data.today || []
+          tomorrowTasks = data.tomorrow || []
+          upcomingTasks = data.upcoming || []
+        }
         renderTasks()
       })
       .catch((error) => {
@@ -468,6 +485,44 @@ document.addEventListener("DOMContentLoaded", () => {
         upcomingTasks = []
         renderTasks()
       })
+  }
+
+  // Show error message for no active profile
+  function showNoActiveProfileError(errorMessage) {
+    log("Showing no active profile error:", errorMessage)
+
+    // Check if error message already exists
+    if (document.getElementById("no-active-profile-error")) {
+      return
+    }
+
+    // Create error message element
+    const errorDiv = document.createElement("div")
+    errorDiv.id = "no-active-profile-error"
+    errorDiv.className = "p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg"
+    errorDiv.innerHTML = `
+  <div class="flex items-center">
+    <i class="fa-solid fa-circle-exclamation mr-2"></i>
+    <span>${errorMessage}</span>
+  </div>
+`
+
+    // Insert at the top of the main content
+    const mainContent = document.querySelector(".container")
+    if (mainContent) {
+      mainContent.insertBefore(errorDiv, mainContent.firstChild)
+    }
+  }
+
+  // Hide error message for no active profile
+  function hideNoActiveProfileError() {
+    log("Hiding no active profile error")
+
+    // Remove error message
+    const errorDiv = document.getElementById("no-active-profile-error")
+    if (errorDiv) {
+      errorDiv.remove()
+    }
   }
 
   // Add todo to server
@@ -481,38 +536,66 @@ document.addEventListener("DOMContentLoaded", () => {
       body: JSON.stringify(todo),
       credentials: "same-origin",
     })
-      .then((response) => {
-        if (!response.ok) {
-          if (response.status === 403) {
-            // Premium limit reached
-            if (premiumModal) {
-              premiumModal.classList.remove("hidden")
-              premiumModal.classList.add("flex")
-              log("Showing premium modal due to 403 response")
-            } else {
-              log("Error: Premium modal element not found")
-              alert("You've reached the maximum number of tasks (5). Please upgrade to premium.")
-            }
-            throw new Error("Premium limit reached")
+    .then((response) => {
+      if (!response.ok) {
+        if (response.status === 403) {
+          // Premium limit reached
+          if (premiumModal) {
+            premiumModal.classList.remove("hidden")
+            premiumModal.classList.add("flex")
+            log("Showing premium modal due to 403 response")
+          } else {
+            log("Error: Premium modal element not found")
+            alert("You've reached the maximum number of tasks (5). Please upgrade to premium.")
           }
-          return response.json().then((err) => {
-            throw new Error(err.error || `HTTP error! Status: ${response.status}`)
+          throw new Error("Premium limit reached")
+        }
+        if (response.status === 400) {
+          // No active profile selected, show error but still add the todo locally
+          return response.json().then((data) => {
+            showNoActiveProfileError(data.error || "No active profile selected. Data will be erased when refreshed.")
+            
+            // Create a temporary todo with a generated ID
+            const tempTodo = {
+              ...todo,
+              id: Date.now(),
+              completed: false,
+            }
+
+            // Add to appropriate list based on date
+            const today = new Date().toISOString().split("T")[0]
+            const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0]
+
+            if (todo.date === today) {
+              todayTasks.push(tempTodo)
+            } else if (todo.date === tomorrow) {
+              tomorrowTasks.push(tempTodo)
+            } else {
+              upcomingTasks.push(tempTodo)
+            }
+
+            renderTasks()
+            return { todo: tempTodo }
           })
         }
-        return response.json()
-      })
-      .then((data) => {
-        log("Server response after adding todo:", data)
-        // Reload todos from server
-        loadTodosFromServer()
-      })
-      .catch((error) => {
-        log("Error adding todo:", error)
-        // If not a premium error, show general error
-        if (!error.message.includes("Premium")) {
-          alert("There was an error adding the todo: " + error.message)
-        }
-      })
+        return response.json().then((err) => {
+          throw new Error(err.error || `HTTP error! Status: ${response.status}`)
+        })
+      }
+      return response.json()
+    })
+    .then((data) => {
+      log("Server response after adding todo:", data)
+      // Reload todos from server
+      loadTodosFromServer()
+    })
+    .catch((error) => {
+      log("Error adding todo:", error)
+      // If not a premium error, show general error
+      if (!error.message.includes("Premium")) {
+        alert("There was an error adding the todo: " + error.message)
+      }
+    })
   }
 
   // Update todo on server

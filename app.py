@@ -852,17 +852,17 @@ def delete_medication_history(history_id):
 @login_required
 def get_todos():
     try:
+        # Check if an active profile is selected
+        profile_id = session.get('active_profile_id')
+        if not profile_id:
+            return jsonify({'error': 'No active profile selected. Data will be erased when refreshed.'}), 400
+            
         # Get current date
         today = datetime.now().date()
         tomorrow = (datetime.now() + timedelta(days=1)).date()
         
-        # Get todos for the current user
-        todos_query = Todo.query.filter_by(user_id=current_user.id)
-        
-        # Filter by profile if one is active
-        profile_id = session.get('active_profile_id')
-        if profile_id:
-            todos_query = todos_query.filter((Todo.profile_id == profile_id) | (Todo.profile_id == None))
+        # Get todos for the current user and profile
+        todos_query = Todo.query.filter_by(user_id=current_user.id, profile_id=profile_id)
         
         # Get all todos
         all_todos = todos_query.all()
@@ -894,17 +894,15 @@ def get_todos():
 @login_required
 def add_todo():
     try:
-        # Check if user has reached the todo limit (5 for free users)
+        # Check if an active profile is selected
         profile_id = session.get('active_profile_id')
-        if profile_id:
-            todo_count = Todo.query.filter_by(user_id=current_user.id, profile_id=profile_id).count()
-            if todo_count >= 5:
-                return jsonify({'error': 'You have reached the maximum number of todos (5). Please upgrade to premium.'}), 403
-        else:
-            # If no profile is selected, count all todos for this user
-            todo_count = Todo.query.filter_by(user_id=current_user.id).count()
-            if todo_count >= 5:
-                return jsonify({'error': 'You have reached the maximum number of todos (5). Please upgrade to premium.'}), 403
+        if not profile_id:
+            return jsonify({'error': 'No active profile selected. Data will be erased when refreshed.'}), 400
+            
+        # Check if user has reached the todo limit (5 for free users)
+        todo_count = Todo.query.filter_by(user_id=current_user.id, profile_id=profile_id).count()
+        if todo_count >= 5:
+            return jsonify({'error': 'You have reached the maximum number of todos (5). Please upgrade to premium.'}), 403
         
         data = request.get_json()
         if not data:
@@ -912,8 +910,6 @@ def add_todo():
         
         # Convert string date to datetime object
         date = datetime.strptime(data['date'], '%Y-%m-%d').date()
-        
-        profile_id = session.get('active_profile_id')
         
         new_todo = Todo(
             text=data['text'],
@@ -1000,13 +996,13 @@ def delete_todo(todo_id):
 @login_required
 def get_health_records():
     try:
-        # Get health records for the current user
-        records_query = HealthRecord.query.filter_by(user_id=current_user.id)
-        
-        # Filter by profile if one is active
+        # Check if an active profile is selected
         profile_id = session.get('active_profile_id')
-        if profile_id:
-            records_query = records_query.filter((HealthRecord.profile_id == profile_id) | (HealthRecord.profile_id == None))
+        if not profile_id:
+            return jsonify({'error': 'No active profile selected. Data will be erased when refreshed.'}), 400
+            
+        # Get health records for the current user and profile
+        records_query = HealthRecord.query.filter_by(user_id=current_user.id, profile_id=profile_id)
         
         # Get all records sorted by timestamp (newest first)
         all_records = records_query.order_by(HealthRecord.timestamp.desc()).all()
@@ -1028,51 +1024,33 @@ def add_health_record():
         
         profile_id = session.get('active_profile_id')
         
+        # Check if an active profile is selected
+        if not profile_id:
+            return jsonify({'error': 'No active profile selected. Data will be erased when refreshed.'}), 400
+        
         # Check if user has reached the health record limit (3 for free users)
-        profile_id = session.get('active_profile_id')
-        if profile_id:
-            # Count unique types for vital signs and biometrics for this profile
-            unique_vital_signs = db.session.query(HealthRecord.type).filter(
-                HealthRecord.user_id == current_user.id,
-                HealthRecord.profile_id == profile_id,
-                HealthRecord.category == 'vital-signs'
-            ).distinct().count()
-            
-            unique_biometrics = db.session.query(HealthRecord.type).filter(
-                HealthRecord.user_id == current_user.id,
-                HealthRecord.profile_id == profile_id,
-                HealthRecord.category == 'biometrics'
-            ).distinct().count()
-            
-            medical_notes_count = HealthRecord.query.filter_by(
-                user_id=current_user.id,
-                profile_id=profile_id,
-                category='medical-notes'
-            ).count()
-            
-            total_record_types = unique_vital_signs + unique_biometrics + (1 if medical_notes_count > 0 else 0)
-            if total_record_types >= 3:
-                return jsonify({'error': 'You have reached the maximum number of health record types (3). Please upgrade to premium.'}), 403
-        else:
-            # If no profile is selected, count all health records for this user
-            unique_vital_signs = db.session.query(HealthRecord.type).filter(
-                HealthRecord.user_id == current_user.id,
-                HealthRecord.category == 'vital-signs'
-            ).distinct().count()
-            
-            unique_biometrics = db.session.query(HealthRecord.type).filter(
-                HealthRecord.user_id == current_user.id,
-                HealthRecord.category == 'biometrics'
-            ).distinct().count()
-            
-            medical_notes_count = HealthRecord.query.filter_by(
-                user_id=current_user.id,
-                category='medical-notes'
-            ).count()
-            
-            total_record_types = unique_vital_signs + unique_biometrics + (1 if medical_notes_count > 0 else 0)
-            if total_record_types >= 3:
-                return jsonify({'error': 'You have reached the maximum number of health record types (3). Please upgrade to premium.'}), 403
+        # Count unique types for vital signs and biometrics for this profile
+        unique_vital_signs = db.session.query(HealthRecord.type).filter(
+            HealthRecord.user_id == current_user.id,
+            HealthRecord.profile_id == profile_id,
+            HealthRecord.category == 'vital-signs'
+        ).distinct().count()
+        
+        unique_biometrics = db.session.query(HealthRecord.type).filter(
+            HealthRecord.user_id == current_user.id,
+            HealthRecord.profile_id == profile_id,
+            HealthRecord.category == 'biometrics'
+        ).distinct().count()
+        
+        medical_notes_count = HealthRecord.query.filter_by(
+            user_id=current_user.id,
+            profile_id=profile_id,
+            category='medical-notes'
+        ).count()
+        
+        total_record_types = unique_vital_signs + unique_biometrics + (1 if medical_notes_count > 0 else 0)
+        if total_record_types >= 3:
+            return jsonify({'error': 'You have reached the maximum number of health record types (3). Please upgrade to premium.'}), 403
         
         # Convert string date to datetime object
         date = datetime.strptime(data['date'], '%Y-%m-%d').date()
