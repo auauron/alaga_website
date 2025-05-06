@@ -639,7 +639,7 @@ def get_medications():
     profile_id = session.get('active_profile_id')
     
     if not profile_id:
-        return jsonify({'error': 'No active profile selected. Data will be erased when refreshed.'}), 400
+        return jsonify({'error': 'No active care profile selected. Data will be erased when refreshed.'}), 400
     
     # Verify the profile belongs to the current user
     profile = CareProfile.query.filter_by(id=profile_id, user_id=current_user.id).first()
@@ -659,7 +659,7 @@ def add_medication():
     profile_id = session.get('active_profile_id')
     
     if not profile_id:
-        return jsonify({'error': 'No active profile selected. Data will be erased when refreshed.'}), 400
+        return jsonify({'error': 'No active care profile selected. Data will be erased when refreshed.'}), 400
     
     # Verify the profile belongs to the current user
     profile = CareProfile.query.filter_by(id=profile_id, user_id=current_user.id).first()
@@ -855,7 +855,7 @@ def get_todos():
         # Check if an active profile is selected
         profile_id = session.get('active_profile_id')
         if not profile_id:
-            return jsonify({'error': 'No active profile selected. Data will be erased when refreshed.'}), 400
+            return jsonify({'error': 'No active care profile selected. Data will be erased when refreshed.'}), 400
             
         # Get current date
         today = datetime.now().date()
@@ -897,7 +897,7 @@ def add_todo():
         # Check if an active profile is selected
         profile_id = session.get('active_profile_id')
         if not profile_id:
-            return jsonify({'error': 'No active profile selected. Data will be erased when refreshed.'}), 400
+            return jsonify({'error': 'No active care profile selected. Data will be erased when refreshed.'}), 400
             
         # Check if user has reached the todo limit (5 for free users)
         todo_count = Todo.query.filter_by(user_id=current_user.id, profile_id=profile_id).count()
@@ -999,7 +999,7 @@ def get_health_records():
         # Check if an active profile is selected
         profile_id = session.get('active_profile_id')
         if not profile_id:
-            return jsonify({'error': 'No active profile selected. Data will be erased when refreshed.'}), 400
+            return jsonify({'error': 'No active care profile selected. Data will be erased when refreshed.'}), 400
             
         # Get health records for the current user and profile
         records_query = HealthRecord.query.filter_by(user_id=current_user.id, profile_id=profile_id)
@@ -1026,7 +1026,7 @@ def add_health_record():
         
         # Check if an active profile is selected
         if not profile_id:
-            return jsonify({'error': 'No active profile selected. Data will be erased when refreshed.'}), 400
+            return jsonify({'error': 'No active care profile selected. Data will be erased when refreshed.'}), 400
         
         # Check if user has reached the health record limit (3 for free users)
         # Count unique types for vital signs and biometrics for this profile
