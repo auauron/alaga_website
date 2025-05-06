@@ -129,13 +129,7 @@
                         <div>
                           <h3 class="font-medium text-gray-900">{{ med.name }}</h3>
                           <p class="text-sm text-gray-600">{{ med.dosage }}</p>
-                          <p class="text-xs text-gray-500">
-                            {% if active_profile %}
-                              For {{ active_profile.care_recipient }} - {{ med.instructions }}
-                            {% else %}
-                              {{ med.instructions }}
-                            {% endif %}
-                          </p>
+                          <p class="text-xs text-gray-500"> {{ med.instructions }}</p>
                         </div>
                       </div>
                       <div class="flex items-center">
@@ -231,17 +225,14 @@
                             {% else %}
                               <span class="font-medium">{{ record.value }}</span>
                             {% endif %}
-                            {% if active_profile %}
-                              <span class="text-xs text-gray-500">({{ active_profile.care_recipient }})</span>
-                            {% endif %}
+                          
+                           
                           </p>
                         {% else %}
                           <h3 class="font-medium text-gray-900">{{ record.subject }}</h3>
                           <p class="text-sm text-gray-600">
                             {{ record.body|truncate(50) }}
-                            {% if active_profile %}
-                              <span class="text-xs text-gray-500">({{ active_profile.care_recipient }})</span>
-                            {% endif %}
+                          
                           </p>
                         {% endif %}
                       </div>
