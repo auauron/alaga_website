@@ -639,7 +639,7 @@ def get_medications():
     profile_id = session.get('active_profile_id')
     
     if not profile_id:
-        return jsonify({'error': 'No active profile selected'}), 400
+        return jsonify({'error': 'No active profile selected. Data will be erased when refreshed.'}), 400
     
     # Verify the profile belongs to the current user
     profile = CareProfile.query.filter_by(id=profile_id, user_id=current_user.id).first()
@@ -659,7 +659,7 @@ def add_medication():
     profile_id = session.get('active_profile_id')
     
     if not profile_id:
-        return jsonify({'error': 'No active profile selected'}), 400
+        return jsonify({'error': 'No active profile selected. Data will be erased when refreshed.'}), 400
     
     # Verify the profile belongs to the current user
     profile = CareProfile.query.filter_by(id=profile_id, user_id=current_user.id).first()
