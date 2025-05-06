@@ -45,7 +45,7 @@
                 {% if active_profile %}
                 <p class="text-gray-600 text-sm">Ensure {{ active_profile.care_recipient }} takes their meds on time!</p>
                 {% else %}
-                <p class="text-gray-600 text-sm">Select a care profile to manage medications</p>
+                <p class="text-gray-600 text-sm">Please select a care profile first</p>
                 {% endif %}
               </div>
             </div>
@@ -117,7 +117,11 @@
             <div class="mb-2 flex justify-between items-center"> 
               <div>
                 <h2 class="text-4xl font-bold text-[#596BC7]">Med History</h2>
-                <p class="text-gray-600 text-sm"> {{ active_profile.care_recipient }}'s taken and skipped medications. </p>
+                {% if active_profile %}
+                <p class="text-gray-600 text-sm">Ensure {{ active_profile.care_recipient }} taken and skipped medications.</p>
+                {% else %}
+                <p class="text-gray-600 text-sm">Please select a care profile first</p>
+                {% endif %}
               </div>
               <button id="backToMainBtn" class="px-4 py-2 bg-[#BC6FB7] text-white rounded hover:bg-[#E57DDE] transition-colors">
                 Back
