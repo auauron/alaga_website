@@ -672,7 +672,7 @@ document.addEventListener("DOMContentLoaded", () => {
       case "capsule":
         return `<i class="fa-solid fa-capsules" style="color: #2457a8;"></i>`
       case "powder":
-        return `<i class="fa-solid fa-bowl-rice" style="color: #B197FC;"></i>`
+        return `<i class="fa-solid fa-mortar-pestle" style="color: #da78ed;"></i>`
       case "solution":
         return `<i class="fa-solid fa-spoon" style="color: #9090a7;"></i>`
       case "injection":
