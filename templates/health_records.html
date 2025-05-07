@@ -59,6 +59,9 @@
             </div>
           </div>
           
+          {% if not has_profiles %}
+            {% include 'includes/welcome_message.html' %}
+          {% else %}
           <!-- Buttons: Edit and See History -->
           <div class="flex justify-end space-x-3 mb-4">
             <button id="editHealthRecordsBtn" class="px-4 py-2 bg-indigo-300 text-white rounded hover:bg-indigo-400 transition-colors">
@@ -107,6 +110,7 @@
               </div>
             </div>
           </div>
+          {% endif %}
         </main>
 
         <!-- Health Records History Page -->

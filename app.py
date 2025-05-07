@@ -475,6 +475,7 @@ def delete_profile(profile_id):
 def dashboard():
     # Get all profiles for the sidebar
     profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+    has_profiles = len(profiles) > 0
     
     # Get active profile if one is selected
     profile_id = session.get('active_profile_id')
@@ -551,13 +552,15 @@ def dashboard():
                           medications=today_medications,
                           health_records=combined_records,
                           today=today,
-                          image_file=image_file)
+                          image_file=image_file,
+                          has_profiles=has_profiles)
 
 @app.route('/todo', methods=['GET', 'POST'])
 @login_required
 def todo():
     # Your existing todo route code
     profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+    has_profiles = len(profiles) > 0
     
     profile_id = session.get('active_profile_id')
     active_profile = None
@@ -568,14 +571,20 @@ def todo():
     fullname = current_user.fullname
     initials = get_initials(fullname)
     image_file = url_for('static', filename='uploads/profile_pics/' + current_user.profile_pic)
-    return render_template('todo.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile, image_file=image_file)
-
+    return render_template('todo.html', 
+                          fullname=fullname, 
+                          initials=initials, 
+                          profiles=profiles, 
+                          active_profile=active_profile, 
+                          image_file=image_file,
+                          has_profiles=has_profiles)
 #route for medications page
 @app.route('/medications', methods=['GET'])
 @login_required
 def medications():
     # Get all profiles for the sidebar
     profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+    has_profiles = len(profiles) > 0
     
     # Get active profile if one is selected
     profile_id = session.get('active_profile_id')
@@ -587,7 +596,13 @@ def medications():
     fullname = current_user.fullname
     initials = get_initials(fullname)
     image_file = url_for('static', filename='uploads/profile_pics/' + current_user.profile_pic)
-    return render_template('medications.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile, image_file=image_file)
+    return render_template('medications.html', 
+                          fullname=fullname, 
+                          initials=initials, 
+                          profiles=profiles, 
+                          active_profile=active_profile, 
+                          image_file=image_file,
+                          has_profiles=has_profiles)
 
 #route for health records page
 @app.route('/health_records', methods=['GET', 'POST'])
@@ -595,6 +610,7 @@ def medications():
 def health_records():
     # Get all profiles for the sidebar
     profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+    has_profiles = len(profiles) > 0
     
     # Get active profile if one is selected
     profile_id = session.get('active_profile_id')
@@ -606,7 +622,13 @@ def health_records():
     fullname = current_user.fullname
     initials = get_initials(fullname)
     image_file = url_for('static', filename='uploads/profile_pics/' + current_user.profile_pic)
-    return render_template('health_records.html', fullname=fullname, initials=initials, profiles=profiles, active_profile=active_profile, image_file=image_file)
+    return render_template('health_records.html', 
+                          fullname=fullname, 
+                          initials=initials, 
+                          profiles=profiles, 
+                          active_profile=active_profile, 
+                          image_file=image_file,
+                          has_profiles=has_profiles)
 
 @app.route('/switch_profile/<int:profile_id>', methods=['POST'])
 @login_required
@@ -636,14 +658,17 @@ def switch_profile(profile_id):
 @app.route('/api/medications', methods=['GET'])
 @login_required
 def get_medications():
-    profile_id = session.get('active_profile_id')
+
+    profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+    if not profiles:
+        return jsonify({'error': 'Please create a care profile first to manage medications.'}), 400
     
+    profile_id = session.get('active_profile_id')
     if not profile_id:
         return jsonify({'error': 'No active care profile selected. Data will be erased when refreshed.'}), 400
     
     # Verify the profile belongs to the current user
     profile = CareProfile.query.filter_by(id=profile_id, user_id=current_user.id).first()
-    
     if not profile:
         return jsonify({'error': 'Profile not found'}), 404
     
@@ -853,6 +878,10 @@ def delete_medication_history(history_id):
 def get_todos():
     try:
         # Check if an active profile is selected
+        profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+        if not profiles:
+            return jsonify({'error': 'Please create a care profile first to manage todos.'}), 400
+        
         profile_id = session.get('active_profile_id')
         if not profile_id:
             return jsonify({'error': 'No active care profile selected. Data will be erased when refreshed.'}), 400
@@ -996,6 +1025,9 @@ def delete_todo(todo_id):
 @login_required
 def get_health_records():
     try:
+        profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+        if not profiles:
+            return jsonify({'error': 'Please create a care profile first to manage medications.'}), 400
         # Check if an active profile is selected
         profile_id = session.get('active_profile_id')
         if not profile_id:

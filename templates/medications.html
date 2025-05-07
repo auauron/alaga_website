@@ -62,7 +62,11 @@
                 <span id="current-date">Today's date: </span>
               </div>
             </div>
-          
+            
+            {% if not has_profiles %}
+            <!-- Show welcome message when no profiles exist -->
+              {% include 'includes/welcome_message.html' %}
+            {% else %}
             <!-- Buttons: Edit and See History -->
             <div class="flex justify-end space-x-3 mb-4">
               <button id="editMedicationsBtn" class="px-4 py-2 bg-indigo-300 text-white rounded hover:bg-indigo-400 transition-colors">
@@ -109,6 +113,7 @@
                 </div>
               </div>
             </div>
+            {% endif %}
         </main>
 
         <!-- Medication History Page -->

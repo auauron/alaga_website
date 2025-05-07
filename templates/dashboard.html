@@ -50,8 +50,11 @@
             </div>
           </div>  
 
+          {% if not has_profiles %}
+          <!-- Show welcome message when no profiles exist -->
+            {% include 'includes/welcome_message.html' %}
+          {% else %}
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
             <!-- Tasks -->
             <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
               <div class="bg-[#8491D3] px-4 py-3 flex justify-between items-center">
@@ -251,6 +254,7 @@
               {% endif %}
             </div>
           </div>
+          {% endif %}
         </main>
       </div>
     </div>
