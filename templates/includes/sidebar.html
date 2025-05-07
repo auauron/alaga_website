@@ -57,6 +57,10 @@
       <a href="{{ url_for('health_records') }}" class="flex items-center space-x-3 {% if request.endpoint == 'health_records' %}bg-white/10{% endif %} rounded-lg p-3 hover:bg-white/10 dark:hover:bg-white/20 transition">
         <i class="fa-solid fa-notes-medical"></i><span>Health Records</span>
       </a>
+      <!--Care Profiles-->
+      <a href="{{ url_for('photo_album') }}" class="flex items-center space-x-3 {% if request.endpoint == 'health_records' %}bg-white/10{% endif %} rounded-lg p-3 hover:bg-white/10 dark:hover:bg-white/20 transition">
+        <i class="fa-solid fa-image"></i><span>Care Album</span>
+      </a>
     </div>
   </nav>
   

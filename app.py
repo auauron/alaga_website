@@ -18,6 +18,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.root_path, 'database.db')
 app.config['SECRET_KEY'] = 'ubedelechesecretkey'
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static/uploads/profile_pics')
+app.config['PHOTO_UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static/uploads/photos')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -65,6 +66,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     profile_pic = db.Column(db.String(100), nullable=False, default='default.jpg')
+    photos = db.relationship('Photo', backref='user', lazy=True, cascade="all, delete-orphan")
 
     # User medications
     medications = db.relationship('Medication', backref='user_profile', lazy=True, cascade="all, delete-orphan")
@@ -113,6 +115,7 @@ class CareProfile(db.Model):
     # Add relationship to health records
     health_records = db.relationship('HealthRecord', backref='care_profile', lazy=True, cascade="all, delete-orphan")
 
+    photos = db.relationship('Photo', backref='care_profile', lazy=True, cascade="all, delete-orphan")
 # New Medication model
 class Medication(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -223,6 +226,26 @@ class HealthRecord(db.Model):
             
         return result
 
+class Photo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(100), nullable=False)
+    original_filename = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(100), nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    date_taken = db.Column(db.Date, nullable=False)
+    date_uploaded = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    profile_id = db.Column(db.Integer, db.ForeignKey('care_profile.id'), nullable=False)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'filename': self.filename,
+            'title': self.title,
+            'description': self.description,
+            'date_taken': self.date_taken.isoformat() if self.date_taken else None,
+            'date_uploaded': self.date_uploaded.isoformat()
+        }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ROUTES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #route for about us page 
 @app.route('/about') 
@@ -649,6 +672,8 @@ def switch_profile(profile_id):
             return redirect(url_for('view_profile'))
         elif 'health_records' in referrer:
             return redirect(url_for('health_records'))
+        elif 'photo_album' in referrer:
+            return redirect(url_for('photo_album'))
         
     return redirect(url_for('dashboard'))
 
@@ -1196,6 +1221,198 @@ def delete_health_record(record_id):
         app.logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
+# ~~~~~~~~~~~~~~~~~~~~~Care_Album~~~~~~~~~~~~~~~~~~~~~~~
+@app.route('/photo_album', methods=['GET'])
+@login_required
+def photo_album():
+    # Get all profiles for the sidebar
+    profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+    has_profiles = len(profiles) > 0
+    
+    # Get active profile if one is selected
+    profile_id = session.get('active_profile_id')
+    active_profile = None
+    
+    if profile_id:
+        active_profile = CareProfile.query.get(profile_id)
+    
+    fullname = current_user.fullname
+    initials = get_initials(fullname)
+    image_file = url_for('static', filename='uploads/profile_pics/' + current_user.profile_pic)
+    
+    return render_template('photo_album.html', 
+                          fullname=fullname, 
+                          initials=initials, 
+                          profiles=profiles, 
+                          active_profile=active_profile, 
+                          image_file=image_file,
+                          has_profiles=has_profiles)
+
+@app.route('/api/photos', methods=['GET'])
+@login_required
+def get_photos():
+    try:
+        # Check if user has any profiles
+        profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+        if not profiles:
+            return jsonify({'error': 'Please create a care profile first to manage photos.'}), 400
+            
+        # Check if an active profile is selected
+        profile_id = session.get('active_profile_id')
+        if not profile_id:
+            return jsonify({'error': 'No active care profile selected.'}), 400
+            
+        # Get photos for the current profile
+        photos = Photo.query.filter_by(
+            user_id=current_user.id,
+            profile_id=profile_id
+        ).order_by(Photo.date_taken.desc()).all()
+        
+        return jsonify([photo.to_dict() for photo in photos])
+    
+    except Exception as e:
+        app.logger.error(f"Error in get_photos: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/photos', methods=['POST'])
+@login_required
+def add_photo():
+    try:
+        # Check if user has any profiles
+        profiles = CareProfile.query.filter_by(user_id=current_user.id).all()
+        if not profiles:
+            return jsonify({'error': 'Please create a care profile first to manage photos.'}), 400
+            
+        # Check if an active profile is selected
+        profile_id = session.get('active_profile_id')
+        if not profile_id:
+            return jsonify({'error': 'No active care profile selected.'}), 400
+        
+        # Check if user has reached the photo limit (10 for free users)
+        photo_count = Photo.query.filter_by(user_id=current_user.id, profile_id=profile_id).count()
+        if photo_count >= 10:
+            return jsonify({'error': 'You have reached the maximum number of photos (10). Please upgrade to premium.'}), 403
+        
+        # Check if the post request has the file part
+        if 'photo' not in request.files:
+            return jsonify({'error': 'No file part'}), 400
+        
+        file = request.files['photo']
+        
+        # If user does not select file, browser also
+        # submit an empty part without filename
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+        
+        if file and allowed_file(file.filename):
+            # Create a unique filename
+            original_filename = secure_filename(file.filename)
+            ext = original_filename.rsplit('.', 1)[1].lower()
+            new_filename = f"photo_{current_user.id}_{profile_id}_{secrets.token_hex(8)}.{ext}"
+            
+            filepath = os.path.join(app.config['PHOTO_UPLOAD_FOLDER'], new_filename)
+            
+            # Save and resize the image
+            img = Image.open(file)
+            
+            # Maintain aspect ratio but ensure it's not too large
+            max_size = (1200, 1200)
+            img.thumbnail(max_size)
+            
+            # Save the image
+            img.save(filepath)
+            
+            # Get form data
+            title = request.form.get('title', '')
+            description = request.form.get('description', '')
+            date_taken_str = request.form.get('date_taken', datetime.now().strftime('%Y-%m-%d'))
+            date_taken = datetime.strptime(date_taken_str, '%Y-%m-%d').date()
+            
+            # Create new photo record
+            new_photo = Photo(
+                filename=new_filename,
+                original_filename=original_filename,
+                title=title,
+                description=description,
+                date_taken=date_taken,
+                user_id=current_user.id,
+                profile_id=profile_id
+            )
+            
+            db.session.add(new_photo)
+            db.session.commit()
+            
+            return jsonify({
+                'message': 'Photo uploaded successfully',
+                'photo': new_photo.to_dict()
+            })
+        
+        return jsonify({'error': 'File type not allowed'}), 400
+    
+    except Exception as e:
+        app.logger.error(f"Error in add_photo: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/photos/<int:photo_id>', methods=['PUT'])
+@login_required
+def update_photo(photo_id):
+    try:
+        # Find the photo and verify it belongs to the current user
+        photo = Photo.query.filter_by(id=photo_id, user_id=current_user.id).first()
+        
+        if not photo:
+            return jsonify({'error': 'Photo not found'}), 404
+        
+        data = request.form
+        
+        # Update photo fields
+        if 'title' in data:
+            photo.title = data['title']
+        if 'description' in data:
+            photo.description = data['description']
+        if 'date_taken' in data:
+            photo.date_taken = datetime.strptime(data['date_taken'], '%Y-%m-%d').date()
+        
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Photo updated successfully',
+            'photo': photo.to_dict()
+        })
+    
+    except Exception as e:
+        app.logger.error(f"Error in update_photo: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/photos/<int:photo_id>', methods=['DELETE'])
+@login_required
+def delete_photo(photo_id):
+    try:
+        # Find the photo and verify it belongs to the current user
+        photo = Photo.query.filter_by(id=photo_id, user_id=current_user.id).first()
+        
+        if not photo:
+            return jsonify({'error': 'Photo not found'}), 404
+        
+        # Delete the file from the filesystem
+        filepath = os.path.join(app.config['PHOTO_UPLOAD_FOLDER'], photo.filename)
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        
+        # Delete the database record
+        db.session.delete(photo)
+        db.session.commit()
+        
+        return jsonify({'message': 'Photo deleted successfully'})
+    
+    except Exception as e:
+        app.logger.error(f"Error in delete_photo: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+    
 @app.context_processor
 def utility_processor():
     return dict(get_initials=get_initials)
