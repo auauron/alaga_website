@@ -50,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const biometricType = getElement("biometricType")
   const editHealthRecordsModal = getElement("editHealthRecordsModal")
   const healthRecordSelect = getElement("healthRecordSelect")
-  const editHealthRecordForm = getElement("editFormFields")
   const noRecordSelected = getElement("noRecordSelected")
   const cancelEditHealthRecordBtn = getElement("cancelEditHealthRecord")
   const deleteHealthRecordBtn = getElement("deleteHealthRecordBtn")
@@ -64,6 +63,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const addVitalSignBtn = getElement("addVitalSignBtn")
   const addBiometricBtn = getElement("addBiometricBtn")
   const addMedicalNoteBtn = getElement("addMedicalNoteBtn")
+  const editHealthRecordForm = getElement("editHealthRecordForm")
+  const editFormFields = getElement("editFormFields")
 
   // Data storage
   let healthRecords = []
@@ -489,12 +490,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (record) {
         // Show form, hide message
-        if (editHealthRecordForm) editHealthRecordForm.classList.remove("hidden")
-        if (noRecordSelected) noRecordSelected.classList.add("hidden")
-        if (editModalCloseBtn) editModalCloseBtn.classList.add("hidden")
-
-        // Populate form fields based on record type
-        populateEditForm(record)
+        if (editHealthRecordForm) {
+          editHealthRecordForm.classList.remove("hidden")
+          // Make sure the form fields container is accessible
+          if (editFormFields) {
+            populateEditForm(record)
+          } else {
+            log("Error: Edit form fields container not found")
+          }
+        }
       }
     } else {
       // Hide form, show message
@@ -509,20 +513,20 @@ document.addEventListener("DOMContentLoaded", () => {
   function populateEditForm(record) {
     log("Populating edit form with record:", record)
 
-    if (!editHealthRecordForm) {
+    if (!editFormFields) {
       log("Error: Edit form fields container not found")
       return
     }
 
     // Clear existing fields
-    editHealthRecordForm.innerHTML = ""
+    editFormFields.innerHTML = ""
 
     // Add common fields
     const dateField = createFormField("date", "Date", record.date, "date")
     const timeField = createFormField("time", "Time", record.time, "time")
 
-    editHealthRecordForm.appendChild(dateField)
-    editHealthRecordForm.appendChild(timeField)
+    editFormFields.appendChild(dateField)
+    editFormFields.appendChild(timeField)
 
     // Add category-specific fields
     if (record.category === "vital-signs" || record.category === "biometrics") {
@@ -534,14 +538,14 @@ document.addEventListener("DOMContentLoaded", () => {
       typeField.type = "hidden"
       typeField.name = "type"
       typeField.value = record.type
-      editHealthRecordForm.appendChild(typeField)
+      editFormFields.appendChild(typeField)
 
       // Add category as hidden field
       const categoryField = document.createElement("input")
       categoryField.type = "hidden"
       categoryField.name = "category"
       categoryField.value = record.category
-      editHealthRecordForm.appendChild(categoryField)
+      editFormFields.appendChild(categoryField)
 
       if (record.type === "blood-pressure") {
         // Add blood pressure fields
@@ -593,11 +597,11 @@ document.addEventListener("DOMContentLoaded", () => {
         bpContainer.appendChild(bpLabel)
         bpContainer.appendChild(bpInputsContainer)
 
-        editHealthRecordForm.appendChild(bpContainer)
+        editFormFields.appendChild(bpContainer)
       } else {
         // Add value field
         const valueField = createFormField("value", typeLabelCapitalized, record.value, "text")
-        editHealthRecordForm.appendChild(valueField)
+        editFormFields.appendChild(valueField)
       }
     } else if (record.category === "medical-notes") {
       // Add category as hidden field
@@ -605,11 +609,11 @@ document.addEventListener("DOMContentLoaded", () => {
       categoryField.type = "hidden"
       categoryField.name = "category"
       categoryField.value = record.category
-      editHealthRecordForm.appendChild(categoryField)
+      editFormFields.appendChild(categoryField)
 
       // Add subject field
       const subjectField = createFormField("subject", "Subject", record.subject, "text")
-      editHealthRecordForm.appendChild(subjectField)
+      editFormFields.appendChild(subjectField)
 
       // Add body field
       const bodyContainer = document.createElement("div")
@@ -628,7 +632,7 @@ document.addEventListener("DOMContentLoaded", () => {
       bodyContainer.appendChild(bodyLabel)
       bodyContainer.appendChild(bodyTextarea)
 
-      editHealthRecordForm.appendChild(bodyContainer)
+      editFormFields.appendChild(bodyContainer)
     }
   }
 
@@ -1655,6 +1659,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (formData.get("type") === "blood-pressure") {
           updatedFields.systolic = Number.parseInt(formData.get("systolic"))
           updatedFields.diastolic = Number.parseInt(formData.get("diastolic"))
+          updatedFields.value = `${updatedFields.systolic}/${updatedFields.diastolic}`
         } else {
           updatedFields.value = formData.get("value")
         }
